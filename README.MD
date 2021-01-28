@@ -31,19 +31,30 @@ golang gin gorm mysql redis mq
 5. 扩展管理--代理设置（默认override，改成on）
 6. 重启，安装成功
 
-#### 参与贡献
+#### Commit 规范
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+###### 格式如下
+* 例：`fead(type)`:本次提交概述
+* `type`: 本次 commit 的类型，诸如 bugfix docs style 等，参考如下:
+
+    * `fead`：添加新功能
+    * `fix`：修补缺陷
+    * `docs`：修改文档
+    * `style`：修改格式
+    * `refactor`：重构
+    * `perf`：优化
+    * `test`：增加测试
+    * `chore`：构建过程或辅助工具的变动
+    * `revert`：回滚到上一个版本
+
+* `scope`: 本次 `commit` 波及的范围
+* `subject`: 简明扼要的阐述下本次 `commit` 的主旨，在原文中特意强调了几点：
+
+    1. 使用祈使句，是不是很熟悉又陌生的一个词
+    2. 首字母不要大写
+    3. 结尾无需添加标点
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+
+

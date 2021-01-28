@@ -1,3 +1,11 @@
+/*
+ * @Author: your name
+ * @Date: 2020-12-22 11:04:04
+ * @LastEditTime: 2021-01-28 10:14:04
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: /go-cli/go-cli/routers/routers.go
+ */
 package routers
 
 import (
@@ -63,11 +71,6 @@ func InitAPIRouter(basePath string) *gin.Engine {
 		}
 		v1.POST("/user", service.CreateUser) // 用户注册
 		v1.POST("/login", service.UserLogin) // 用户登录
-		// v1.GET("/goroutine", func(c *gin.Context) {
-		// 	cC := c.Copy() // 在这里使用goroutine需要用Context副本
-		// 	// 如果没有固定数量得线程池得话  有可能创建得线程会超出最大承受数量
-		// 	go service.GetUserByName(cC)
-		// })
 	}
 	v2 := router.Group("/v2")
 	{
