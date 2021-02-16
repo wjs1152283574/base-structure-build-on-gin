@@ -12,7 +12,7 @@ golang gin gorm mysql redis mq
 * `utils`:工具类(跨域/JWT/配置文件解析/MD5/验证器/websocket)
 
 
-#### TIPS
+#### TIPS 
 
 * `VScode`扩展安装
 1. `$env:GO111MODULE="on"`

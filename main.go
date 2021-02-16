@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2020-12-22 11:04:04
- * @LastEditTime: 2021-01-28 10:40:24
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /go-cli/go-cli/main.go
- */
 package main
 
 import (
@@ -13,12 +5,10 @@ import (
 	"goweb/database/mysqlmodel"
 	"goweb/routers"
 	"goweb/utils/parsecfg"
-	"goweb/utils/timer"
 	"goweb/utils/ws"
 	"os"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/robfig/cron"
 )
 
 var basePath string // 项目根路径
@@ -50,8 +40,8 @@ func main() {
 	dbName, _ := parsecfg.ConfigParams.Load("MysqlDataBase")
 	dbCharset, _ := parsecfg.ConfigParams.Load("MysqlCharset")
 
-	MsgTimer, _ := parsecfg.ConfigParams.Load("MsgTimer")
-	GroupTimer, _ := parsecfg.ConfigParams.Load("GroupTimer")
+	// MsgTimer, _ := parsecfg.ConfigParams.Load("MsgTimer")
+	// GroupTimer, _ := parsecfg.ConfigParams.Load("GroupTimer")
 	daomysql.InitMysql(dataType.(string), dbUser.(string), dbPwd.(string), dbName.(string), dbCharset.(string)) // 初始化数据库连接
 
 	defer daomysql.DB.Close() // 预操作: 关闭数据库连接
@@ -63,9 +53,9 @@ func main() {
 	APIPort, _ := parsecfg.ConfigParams.Load("ApiPort")
 	r.Run(APIPort.(string)) // 在 0.0.0.0:8080 上监听并服务
 
-	corns := cron.New() // 定时任务
-	corns.Start()
-	defer corns.Stop()
-	corns.AddJob(MsgTimer.(string), timer.StoreMsg{})
-	corns.AddJob(GroupTimer.(string), timer.StoreGroup{})
+	// corns := cron.New() // 定时任务
+	// corns.Start()
+	// defer corns.Stop()
+	// corns.AddJob(MsgTimer.(string), timer.StoreMsg{})
+	// corns.AddJob(GroupTimer.(string), timer.StoreGroup{})
 }
