@@ -5,7 +5,7 @@ golang gin gorm mysql redis mq
 
 #### 架构
 * `config`:配置文件存放
-* `dao`:数据库连接
+* `dao`:数据库连接   
 * `database`:结构体模型
 * `routers`:路由
 * `service`:业务逻辑
