@@ -16,7 +16,7 @@ Mysql:
     Port: "3306" 
     Prefix: "tb_"
     User: "root"
-    Password: "password"
+    Password: "WJS123456."
     Charset: "utf8"
     SetMaxIdleConns: 10
     SetMaxOpenConns: 128
