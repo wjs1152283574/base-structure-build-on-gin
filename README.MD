@@ -1,7 +1,7 @@
 # go-cli
 
 #### 介绍
-golang gin gorm mysql redis mq
+golang gin gorm mysql redis
 
 #### 架构
 * `config`:配置文件存放
