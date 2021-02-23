@@ -27,7 +27,7 @@ golang gin gorm mysql redis
 
 ###### 格式如下
 * 例：`fead(type)`:本次提交概述
-* `type`: 本次 commit 的类型，诸如 bugfix docs style 等，参考如下:
+* `type`: 本次 commit 的类型，诸如 bugfix docs style 等，参考如下:  
 
     * `fead`：添加新功能
     * `fix`：修补缺陷
