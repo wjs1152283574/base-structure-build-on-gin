@@ -1,20 +1,19 @@
-package daoredis
+package appredis
 
 import (
 	"encoding/json"
 	"fmt"
+	"goweb/utils/parsecfg"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 )
 
-// redis 数据库初始化 以及具体配置
-
 // RedisDefaultPool redis 连接池
 var RedisDefaultPool *redis.Pool
 
 func init() {
-	RedisDefaultPool = NewPool("127.0.0.1", "6379", 10, 1000)
+	RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.Host, parsecfg.GlobalConfig.Redis.Port, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive)
 }
 
 // NewPool 项目运行初始化redis连接池

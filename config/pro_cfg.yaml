@@ -13,7 +13,7 @@ Mysql:
   Write:
     Host: "127.0.0.1"
     DataBase: "goweb"
-    Port: "3306" 
+    Port: "3307" 
     Prefix: "tb_"
     User: "root"
     Password: "password"
@@ -40,7 +40,7 @@ Mysql:
 
 Redis:
   Host: "127.0.0.1"
-  Port: 6379
+  Port: 6380
   Auth: ""
   MaxIdle: 10
   MaxActive: 1000

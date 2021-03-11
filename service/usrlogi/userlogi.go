@@ -1,7 +1,7 @@
-package service
+package userlogi
 
 import (
-	"goweb/database/mysqlmodel"
+	"goweb/db/appuser"
 	"goweb/utils/customerjwt"
 	"goweb/utils/passmd5"
 	"goweb/utils/response"
@@ -15,7 +15,7 @@ import (
 
 // CreateUser  新建用户
 func CreateUser(c *gin.Context) {
-	var addUser mysqlmodel.User
+	var addUser appuser.User
 	if err := c.ShouldBindJSON(&addUser); err == nil {
 		addUser.Pwd = passmd5.Base64Md5(addUser.Pwd)
 		if err := addUser.CreateUser(); err == nil {
@@ -31,7 +31,7 @@ func CreateUser(c *gin.Context) {
 // GetUserByName  获取用户信息
 func GetUserByName(c *gin.Context) {
 	// 接口需要认证token --> 从token中解析出name  --> 根据name查看对应用户数据
-	var usr mysqlmodel.User
+	var usr appuser.User
 	// 获取token并解析获得对应用户数据
 	usrname := c.GetString("usrname")
 	var queryStr = []string{"id", "name", "age", "gender", "mobile", "birthday", "created_at"}

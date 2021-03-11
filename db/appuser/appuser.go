@@ -1,7 +1,7 @@
-package mysqlmodel
+package appuser
 
 import (
-	"goweb/dao/daomysql"
+	"goweb/dao/appmysql"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -50,7 +50,7 @@ func (u *User) BeforeCreate(scope *gorm.Scope) (err error) {
 
 // CreateUser 创建用户
 func (u *User) CreateUser() (err error) {
-	if err := daomysql.DB.Create(u).Error; err != nil {
+	if err := appmysql.DB.Create(u).Error; err != nil {
 		return err
 	}
 	return
@@ -73,10 +73,10 @@ type esUser struct {
 
 // GetUser 根据用户名获取用户
 func (u *User) GetUser(username string, queryStr []string) (res esUser, err error) {
-	daomysql.DB.Table("users").Where("name = ?", username).Scan(&res)
-	daomysql.DB.Table("emails").Where("user_id = ?", res.ID).Scan(&res.Emails)
-	daomysql.DB.Table("addresses").Where("id = ?", res.BillingAddressID).Scan(&res.BillingAddress)
-	daomysql.DB.Table("addresses").Where("id = ?", res.ShippingAddressID).Scan(&res.ShippingAddress)
+	appmysql.DB.Table("users").Where("name = ?", username).Scan(&res)
+	appmysql.DB.Table("emails").Where("user_id = ?", res.ID).Scan(&res.Emails)
+	appmysql.DB.Table("addresses").Where("id = ?", res.BillingAddressID).Scan(&res.BillingAddress)
+	appmysql.DB.Table("addresses").Where("id = ?", res.ShippingAddressID).Scan(&res.ShippingAddress)
 	return
 }
 
@@ -113,7 +113,7 @@ type CreditCard struct {
 
 // MyMigrate  创建数据库表  自定义需要创建哪些结构体迁移
 func MyMigrate() {
-	daomysql.DB.AutoMigrate(
+	appmysql.DB.AutoMigrate(
 		&User{},
 		&Address{},
 		&Email{},

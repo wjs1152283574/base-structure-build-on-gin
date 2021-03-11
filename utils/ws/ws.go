@@ -16,7 +16,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	appredis "goweb/dao/daoredis"
+	"goweb/dao/appredis"
 	"goweb/utils/customerjwt"
 	"log"
 	"net/http"
@@ -27,6 +27,17 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/websocket"
 )
+
+// 初始化websocket各项服务
+func init() {
+	go WebsocketManager.Start()
+	go WebsocketManager.SendService()
+	go WebsocketManager.SendService()
+	go WebsocketManager.SendGroupService()
+	go WebsocketManager.SendGroupService()
+	go WebsocketManager.SendAllService()
+	go WebsocketManager.SendAllService()
+}
 
 // TranstMsg 客户端 > 服务端
 type TranstMsg struct {
