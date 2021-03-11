@@ -1,66 +1,94 @@
 package userlogi
 
 import (
+	"fmt"
 	"goweb/db/appuser"
 	"goweb/utils/customerjwt"
 	"goweb/utils/passmd5"
 	"goweb/utils/response"
+	"goweb/utils/statuscode"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
-// CreateUser  新建用户
-func CreateUser(c *gin.Context) {
-	var addUser appuser.User
-	if err := c.ShouldBindJSON(&addUser); err == nil {
-		addUser.Pwd = passmd5.Base64Md5(addUser.Pwd)
-		if err := addUser.CreateUser(); err == nil {
-			c.JSON(http.StatusOK, gin.H{"msg": "user created!", "username": addUser.Name})
-		} else {
-			response.ReturnJSON(c, http.StatusOK, 2001, "invalid params!", err)
-		}
-	} else {
-		response.ReturnJSON(c, http.StatusOK, 2001, "invalid params!", nil)
-		return
-	}
-	addUser.Pwd = passmd5.Base64Md5(addUser.Pwd)
-	if err := addUser.CreateUser(); err != nil {
-		response.ReturnJSON(c, http.StatusOK, 2001, "invalid params!", err)
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"msg": "user created!", "username": addUser.Name})
+// SignUpReq 新建用户请求数据
+type SignUpReq struct {
+	Name   string  `json:"username" binding:"required"`
+	Pwd    string  `json:"password" binding:"required"`
+	Mobile *string `json:"mobile" binding:"required"`
 }
 
-// GetUserByName  获取用户信息
-func GetUserByName(c *gin.Context) {
-	// 接口需要认证token --> 从token中解析出name  --> 根据name查看对应用户数据
-	var usr appuser.User
-	// 获取token并解析获得对应用户数据
-	usrname := c.GetString("usrname")
-	var queryStr = []string{"id", "name", "age", "gender", "mobile", "birthday", "created_at"}
-	if res, err := usr.GetUser(usrname, queryStr); err != nil {
-		response.ReturnJSON(c, http.StatusNotFound, 2004, "用户信息缺失", nil)
-	} else {
-		response.ReturnJSON(c, http.StatusOK, 0, "success", res)
+// SignUp  新建用户
+func SignUp(c *gin.Context) {
+	var postData SignUpReq
+	if err := c.ShouldBind(&postData); err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		return
 	}
+	var me appuser.User
+	me.Mobile = postData.Mobile
+	if err := me.Check(); err == nil { // 通过 `First` API  查找, 不存在侧会报错
+		response.ReturnJSON(c, http.StatusOK, statuscode.AlreadyExit.Code, statuscode.AlreadyExit.Msg, nil)
+		return
+	}
+	me.Name = postData.Name
+	me.Pwd = passmd5.Base64Md5(*postData.Mobile)
+	var res appuser.ResUser
+	if err := me.Create(&res); err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		return
+	}
+	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: res.Name, Password: postData.Pwd}
+	token, err := customerjwt.NewJWT().CreateToken(payLoad)
+	if err != nil {
+		fmt.Println("生成Token失败,可调用登录接口")
+	}
+	response.ReturnJSON(c, http.StatusOK, statuscode.Suucess.Code, statuscode.Suucess.Msg, map[string]interface{}{
+		"infos": res,
+		"token": token,
+	})
 }
 
-// UserLogin 用户登陆 签发token
-func UserLogin(c *gin.Context) {
-	name := c.PostForm("name")
-	pwd := c.PostForm("pwd")
-	if name != "" && pwd != "" {
-		var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: name, Password: pwd}
-		if token, err := customerjwt.NewJWT().CreateToken(payLoad); err != nil {
-			response.ReturnJSON(c, http.StatusBadRequest, 2004, "参数不全或不可用", nil)
-		} else {
-			data := map[string]string{"token": token}
-			response.ReturnJSON(c, http.StatusOK, 1, "success!", data)
-		}
-	} else {
-		response.ReturnJSON(c, http.StatusBadRequest, 2003, "参数不全或不可用!", nil)
+// GetUser  获取用户信息
+func GetUser(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, err)
+		return
 	}
+	var me appuser.User
+	var res appuser.ResUser
+	me.ID = uint(id)
+	if err := me.Get(&res); err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		return
+	}
+	response.ReturnJSON(c, http.StatusOK, statuscode.Suucess.Code, statuscode.Suucess.Msg, res)
+}
 
+// SignInReq 登录请求结构
+type SignInReq struct {
+	Name string `json:"name"`
+	Pass string `json:"pass"`
+}
+
+// SignIn 用户登陆 签发token
+func SignIn(c *gin.Context) {
+	var postData SignUpReq
+	if err := c.ShouldBind(&postData); err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		return
+	}
+	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: postData.Name, Password: postData.Pwd}
+	token, err := customerjwt.NewJWT().CreateToken(payLoad)
+	if err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		return
+	}
+	response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, map[string]interface{}{
+		"token": token,
+	})
 }

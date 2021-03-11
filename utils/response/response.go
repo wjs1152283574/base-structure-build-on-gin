@@ -1,3 +1,8 @@
+/*
+ * @Author: Casso-Wong
+ * @Date: 2020-12-24 10:15:26
+ * @Description: 可实现分页功能,已经在使用
+ */
 package response
 
 // 基于gin 自定义返回格式
@@ -13,6 +18,18 @@ func ReturnJSON(Context *gin.Context, httpCode int, dataCode int, msg string, da
 		"code": dataCode,
 		"msg":  msg,
 		"data": data,
+	})
+}
+
+// ReturnJSONPage 参数: http状态码 自定义状态码 提示信息字符串  json数据 添加总数/上页/下页
+func ReturnJSONPage(Context *gin.Context, httpCode int, dataCode int, msg string, pageNmus int, data interface{}) {
+	//Context.Header("key2020","value2020")  	//可以根据实际情况在头部添加额外的其他信息
+	// 返回 json数据
+	Context.JSON(httpCode, gin.H{
+		"code":  dataCode,
+		"msg":   msg,
+		"data":  data,
+		"total": pageNmus, // 根据所传limit以及数据库内总条数生成这个pageNums:便于前端分页
 	})
 }
 

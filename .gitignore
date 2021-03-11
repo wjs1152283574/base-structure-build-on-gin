@@ -1,8 +1,16 @@
 /.idea/
 .idea/
 .idea
-/log/*
 # .vscode
 .git
 .gin.log
 # /storage/uploaded/*
+
+
+/static
+/tem
+*.log
+/docker-db
+/data
+/init
+/docker-conf

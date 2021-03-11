@@ -1,12 +1,14 @@
 # go-cli
 
 #### 介绍
-golang gin gorm mysql redis
+* 涉及:`golang` `gin` `gorm` `mysql` `redis` `viper` `websocket` `crons` `fastdfs` `docker` 暂时这么多,慢慢添加
+* 不管是直接编译运行还是使用`docker`,记得先看清楚配置文件修改了没有哦
+* 这个根据个人经验整合的一个最基础的项目结构. 
 
 #### 架构
 * `config`:配置文件存放
 * `dao`:数据库连接   
-* `database`:结构体模型
+* `db`:结构体模型
 * `routers`:路由
 * `service`:业务逻辑
 * `utils`:工具类(跨域/JWT/配置文件解析/MD5/验证器/websocket)

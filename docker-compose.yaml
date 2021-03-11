@@ -1,0 +1,46 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports: 
+      - "9000:9000"
+    depends_on: 
+      - redis
+      - db
+      - fastdfs
+  fastdfs:
+    container_name: fastdfs
+    image: sjqzhang/go-fastdfs
+    environment:
+      - GO_FASTDFS_DIR=/data
+    restart: always
+    ports:
+      - 80:8080
+    volumes:
+      - ./data:/data
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports: 
+      - 6380:6379
+  db:
+    # restart: always
+    image: mysql:5.7.22
+    container_name: mysql_5.7
+    ports:
+      - 3307:3306
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: "password"   # defaultUser : root
+      MYSQL_DATABASE: "goweb"
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+      --lower_case_table_names=1
+      --max_allowed_packet=128M
+      --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO"
+    volumes:
+      - ./docker-db:/var/lib/mysql
+      # - "./init:/docker-entrypoint-initdb.d/"

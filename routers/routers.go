@@ -39,10 +39,10 @@ func InitAPIRouter() *gin.Engine {
 		v12 := v1.Group("/auth")
 		v12.Use(customerjwt.JWTAuth())
 		{
-			v12.GET("/user", userlogi.GetUserByName) // 查看用户信息
+			v12.GET("/user/:id", userlogi.GetUser) // 查看用户信息
 		}
-		v1.POST("/user", userlogi.CreateUser) // 用户注册
-		v1.POST("/login", userlogi.UserLogin) // 用户登录
+		v1.POST("/user", userlogi.SignUp)  // 用户注册
+		v1.POST("/login", userlogi.SignIn) // 用户登录
 	}
 	return router
 }
