@@ -19,10 +19,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func init() {
-	InitAPIRouter().Run(parsecfg.GlobalConfig.Port)
-}
-
 // InitAPIRouter 路由初始化
 func InitAPIRouter() *gin.Engine {
 	var router *gin.Engine
@@ -47,11 +43,6 @@ func InitAPIRouter() *gin.Engine {
 		}
 		v1.POST("/user", userlogi.CreateUser) // 用户注册
 		v1.POST("/login", userlogi.UserLogin) // 用户登录
-	}
-	v2 := router.Group("/v2")
-	{
-		v2.POST("/user", userlogi.CreateUser)
-		v2.GET("/user", userlogi.GetUserByName)
 	}
 	return router
 }

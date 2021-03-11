@@ -7,7 +7,14 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// #####################User模型相关--------START
+func init() {
+	appmysql.DB.AutoMigrate(
+		&User{},
+		&Address{},
+		&Email{},
+		&Language{},
+		&CreditCard{})
+}
 
 // User 用户模型
 type User struct {
@@ -33,54 +40,35 @@ type User struct {
 }
 
 // AfterCreate 创建 User 之后执行得钩子函数 --- 自动执行
-func (u *User) AfterCreate(scope *gorm.Scope) (err error) {
-	if u.ID == 1 {
-		scope.DB().Model(u).Update("role", "admin")
-	}
-	return
+func (u *User) AfterCreate(scope *gorm.Scope) error {
+	return scope.DB().Model(u).Update("role", "admin").Error
 }
 
 // BeforeCreate 创建 User 之前执行得钩子函数 --- 自动执行
-func (u *User) BeforeCreate(scope *gorm.Scope) (err error) {
-	if u.Age == 0 {
-		u.Age = 18
-	}
+func (u *User) BeforeCreate(scope *gorm.Scope) error {
 	return nil
 }
 
 // CreateUser 创建用户
-func (u *User) CreateUser() (err error) {
-	if err := appmysql.DB.Create(u).Error; err != nil {
-		return err
-	}
-	return
+func (u *User) CreateUser() error {
+	return appmysql.DB.Create(u).Error
 }
 
-type esUser struct {
-	ID                int        `json:"usr_id"`
-	Age               int        `json:"age"`
-	Name              string     `json:"username"`
-	Gender            int        `json:"sex"`
-	Mobile            string     `json:"phone"`
-	Birthday          *time.Time `json:"birthday"`
-	CreatedAt         time.Time  `json:"join_day"`
-	Emails            []Email    `json:"emails"`
-	BillingAddress    Address    `json:"addr_billing"`
-	BillingAddressID  *int       `json:"-"`
-	ShippingAddress   Address    `json:"addr_shipping"`
-	ShippingAddressID *int       `json:"-"`
+// ResUser query response
+type ResUser struct {
+	ID        int        `json:"usr_id"`
+	Age       int        `json:"age"`
+	Name      string     `json:"username"`
+	Gender    int        `json:"sex"`
+	Mobile    string     `json:"phone"`
+	Birthday  *time.Time `json:"birthday"`
+	CreatedAt time.Time  `json:"join_day"`
 }
 
-// GetUser 根据用户名获取用户
-func (u *User) GetUser(username string, queryStr []string) (res esUser, err error) {
-	appmysql.DB.Table("users").Where("name = ?", username).Scan(&res)
-	appmysql.DB.Table("emails").Where("user_id = ?", res.ID).Scan(&res.Emails)
-	appmysql.DB.Table("addresses").Where("id = ?", res.BillingAddressID).Scan(&res.BillingAddress)
-	appmysql.DB.Table("addresses").Where("id = ?", res.ShippingAddressID).Scan(&res.ShippingAddress)
-	return
+// CheckUsr 检测用户是否存在,并返回基础信息
+func (u *User) CheckUsr(res *ResUser) error {
+	return appmysql.DB.Where("name = ?", u.Name).First(res).Error
 }
-
-// #####################User模型相关--------END
 
 // Email 邮箱
 type Email struct {
@@ -109,14 +97,4 @@ type CreditCard struct {
 	gorm.Model
 	UserID uint
 	Number string `gorm:"not null;type:varchar(25);unique" json:"cnums"`
-}
-
-// MyMigrate  创建数据库表  自定义需要创建哪些结构体迁移
-func MyMigrate() {
-	appmysql.DB.AutoMigrate(
-		&User{},
-		&Address{},
-		&Email{},
-		&Language{},
-		&CreditCard{})
 }

@@ -41,5 +41,8 @@
         "IndexDb":1,
         "ConnFailRetryTimes":3,
         "ReConnectInterval":1
+    },
+    "Timer":{
+        "Store":"*/5 * * * * ?"  
     }
 }
