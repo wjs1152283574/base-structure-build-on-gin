@@ -11,6 +11,7 @@ import (
 	"goweb/utils/parsecfg"
 
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // DB DB
@@ -23,12 +24,12 @@ func init() {
 // InitMysql 初始化数据库连接
 func InitMysql() {
 	// 数据链对象--mysql
-	fmt.Println(parsecfg.GlobalConfig.UseDbType)
+	fmt.Println(parsecfg.GlobalConfig.DbType)
 	hp := net.JoinHostPort(parsecfg.GlobalConfig.Mysql.Write.Host, parsecfg.GlobalConfig.Mysql.Write.Port) // 需要使用这个方法将host/port 拼接起来才能正常运行
 	str := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=Local", parsecfg.GlobalConfig.Mysql.Write.User, parsecfg.GlobalConfig.Mysql.Write.PassWord, hp, parsecfg.GlobalConfig.Mysql.Write.DataBase, parsecfg.GlobalConfig.Mysql.Write.ChatSet)
 	fmt.Println(str)
 
-	db, err := gorm.Open(parsecfg.GlobalConfig.UseDbType, str)
+	db, err := gorm.Open(parsecfg.GlobalConfig.DbType, str)
 	if err != nil {
 		panic(err)
 	}

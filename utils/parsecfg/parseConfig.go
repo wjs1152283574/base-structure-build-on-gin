@@ -13,11 +13,9 @@ var GlobalConfig EnvCfg
 // EnvCfg app 基本设置
 type EnvCfg struct {
 	Debug            bool
-	UseDbType        string
-	AppPort          string
-	WebPort          string
-	AllowCrossDomian bool
-	SetMaxIdleConns  int
+	DbType           string
+	Port             string
+	AllowCrossDomain bool
 	Mysql            MysqlCfg
 	Redis            RedisCfg
 }
@@ -65,13 +63,17 @@ type RedisCfg struct {
 func init() {
 	path, _ := os.Getwd()
 	cfg := viper.New()
+	viper.WatchConfig()
 	cfg.AddConfigPath(path + "/config")
-	cfg.SetConfigName("pro_cfg")
-	cfg.SetConfigType("yaml")
-	if err := cfg.Unmarshal(&GlobalConfig); err != nil {
-		panic("读取配置未见出错")
+	cfg.SetConfigName("cfg")
+	cfg.SetConfigType("json")
+	if err := cfg.ReadInConfig(); err != nil { // 必须 先 读取 `ReadInConfig`
+		panic(err)
 	}
-	fmt.Println(GlobalConfig.AppPort, "1234689", path+"/config")
+	if err := cfg.Unmarshal(&GlobalConfig); err != nil { // 才能反序列化到 结构体里面
+		panic("读取配置文件出错")
+	}
+	fmt.Println(GlobalConfig)
 }
 
 // // 解析配置文件

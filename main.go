@@ -7,7 +7,6 @@ import (
 	_ "goweb/utils/parsecfg"
 	_ "goweb/utils/ws"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/robfig/cron"
 )
 

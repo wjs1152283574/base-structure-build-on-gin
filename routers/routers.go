@@ -20,7 +20,7 @@ import (
 )
 
 func init() {
-	InitAPIRouter().Run(parsecfg.GlobalConfig.AppPort)
+	InitAPIRouter().Run(parsecfg.GlobalConfig.Port)
 }
 
 // InitAPIRouter 路由初始化
@@ -35,7 +35,7 @@ func InitAPIRouter() *gin.Engine {
 	//  初始化
 	router = gin.Default()
 	//根据配置进行设置跨域
-	if parsecfg.GlobalConfig.AllowCrossDomian {
+	if parsecfg.GlobalConfig.AllowCrossDomain {
 		router.Use(cors.Next()) // 启用跨域中间件
 	}
 	v1 := router.Group("/v1")
