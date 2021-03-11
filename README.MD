@@ -1,18 +1,18 @@
 # go-cli
 
 #### 介绍
-golang gin gorm mysql redis mq
+golang gin gorm mysql redis
 
 #### 架构
 * `config`:配置文件存放
-* `dao`:数据库连接
+* `dao`:数据库连接   
 * `database`:结构体模型
 * `routers`:路由
 * `service`:业务逻辑
 * `utils`:工具类(跨域/JWT/配置文件解析/MD5/验证器/websocket)
 
 
-#### 安装教程
+#### TIPS     
 
 * `VScode`扩展安装
 1. `$env:GO111MODULE="on"`
@@ -21,21 +21,13 @@ golang gin gorm mysql redis mq
 4. `go env -w GOPRIVATE=*.corp.example.com`
 5. 扩展管理--代理设置（默认override，改成on）
 6. 重启，安装成功
-#### 使用说明
 
-* `VScode`扩展安装
-1. `$env:GO111MODULE="on"`
-2. `$env:GOPROXY="https://goproxy.io"`
-3. `go env -w GOPROXY=https://goproxy.io,direct`
-4. `go env -w GOPRIVATE=*.corp.example.com`
-5. 扩展管理--代理设置（默认override，改成on）
-6. 重启，安装成功
 
 #### Commit 规范
 
 ###### 格式如下
 * 例：`fead(type)`:本次提交概述
-* `type`: 本次 commit 的类型，诸如 bugfix docs style 等，参考如下:
+* `type`: 本次 commit 的类型，诸如 bugfix docs style 等，参考如下:  
 
     * `fead`：添加新功能
     * `fix`：修补缺陷

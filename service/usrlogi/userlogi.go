@@ -11,8 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// 逻辑控制器
-
 // CreateUser  新建用户
 func CreateUser(c *gin.Context) {
 	var addUser appuser.User
@@ -25,7 +23,14 @@ func CreateUser(c *gin.Context) {
 		}
 	} else {
 		response.ReturnJSON(c, http.StatusOK, 2001, "invalid params!", nil)
+		return
 	}
+	addUser.Pwd = passmd5.Base64Md5(addUser.Pwd)
+	if err := addUser.CreateUser(); err != nil {
+		response.ReturnJSON(c, http.StatusOK, 2001, "invalid params!", err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"msg": "user created!", "username": addUser.Name})
 }
 
 // GetUserByName  获取用户信息
