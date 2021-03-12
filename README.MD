@@ -1,7 +1,7 @@
 # go-cli
 
 #### 介绍
-* 涉及:`golang` `gin` `gorm` `mysql` `redis` `viper` `websocket` `crons` `fastdfs` `docker` 暂时这么多,慢慢添加
+* 涉及:`golang` `gin` `gorm` `mysql` `redis` `viper` `websocket` `crons` `base64Captcha` `fastdfs` `docker` 暂时这么多,慢慢添加
 * 不管是直接编译运行还是使用`docker`,记得先看清楚配置文件修改了没有哦
 * 这个根据个人经验整合的一个最基础的项目结构. 
 
