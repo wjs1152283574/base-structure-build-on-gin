@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2020-12-22 11:04:04
- * @LastEditTime: 2021-01-28 10:14:04
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /go-cli/go-cli/routers/routers.go
- */
 package routers
 
 import (

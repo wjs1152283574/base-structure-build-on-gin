@@ -19,6 +19,18 @@ var Faillure = comment{
 	Msg:  "操作失败!",
 }
 
+// FailToken 无效otken
+var FailToken = comment{
+	Code: -2,
+	Msg:  "无效otken!",
+}
+
+// ExprieToken token过期
+var ExprieToken = comment{
+	Code: -3,
+	Msg:  "token过期!",
+}
+
 // Faillure 操作失败
 var InvalidParam = comment{
 	Code: 40000,

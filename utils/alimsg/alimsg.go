@@ -16,7 +16,6 @@ import (
 // 封装发送短信功能:
 // 1. 自动生成 6 位数随机码
 // 2. 发送到阿里短信api
-// 3. 存入redis
 
 // Code 生成6位数随机码-- string
 func Code() (res string) {

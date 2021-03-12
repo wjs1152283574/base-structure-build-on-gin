@@ -3,6 +3,7 @@ module goweb
 go 1.14
 
 require (
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.977 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.6.3
@@ -14,6 +15,7 @@ require (
 	github.com/json-iterator/go v1.1.10 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
+	github.com/mojocn/base64Captcha v1.3.1 // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/spf13/viper v1.7.1
 	golang.org/x/sys v0.0.0-20200831180312-196b9ba8737a // indirect

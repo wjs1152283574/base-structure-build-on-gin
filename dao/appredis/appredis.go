@@ -21,8 +21,8 @@ func NewPool(addr, port string, max, maxactive int) *redis.Pool { // 传入 ip:p
 	str := addr + ":" + port
 	fmt.Println(str)
 	return &redis.Pool{
-		MaxIdle:     10,
-		MaxActive:   300,
+		MaxIdle:     max,
+		MaxActive:   maxactive,
 		IdleTimeout: 240 * time.Second,
 		Dial: func() (conn redis.Conn, e error) {
 			return redis.Dial("tcp", str)

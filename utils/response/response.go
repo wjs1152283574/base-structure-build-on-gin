@@ -21,15 +21,15 @@ func ReturnJSON(Context *gin.Context, httpCode int, dataCode int, msg string, da
 	})
 }
 
-// ReturnJSONPage 参数: http状态码 自定义状态码 提示信息字符串  json数据 添加总数/上页/下页
-func ReturnJSONPage(Context *gin.Context, httpCode int, dataCode int, msg string, pageNmus int, data interface{}) {
+// ReturnJSONPage 参数: http状态码 自定义状态码 提示信息字符串  json数据 添加总条数: 可根据前端limit返回对应数据
+func ReturnJSONPage(Context *gin.Context, httpCode int, dataCode int, msg string, totals int, data interface{}) {
 	//Context.Header("key2020","value2020")  	//可以根据实际情况在头部添加额外的其他信息
 	// 返回 json数据
 	Context.JSON(httpCode, gin.H{
 		"code":  dataCode,
 		"msg":   msg,
 		"data":  data,
-		"total": pageNmus, // 根据所传limit以及数据库内总条数生成这个pageNums:便于前端分页
+		"total": totals, // 根据所传limit以及数据库内总条数生成这个pageNums:便于前端分页
 	})
 }
 

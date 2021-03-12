@@ -3,6 +3,8 @@ package customerjwt
 import (
 	"errors"
 	"fmt"
+	"goweb/utils/response"
+	"goweb/utils/statuscode"
 	"log"
 	"net/http"
 	"strings"
@@ -18,10 +20,7 @@ func JWTAuth() gin.HandlerFunc {
 		tokenStr := c.Request.Header.Get("Authorization")
 		var token = ""
 		if tokenStr == "" {
-			c.JSON(http.StatusOK, gin.H{
-				"status": -1,
-				"msg":    "请求未携带token，无权限访问",
-			})
+			response.ReturnJSON(c, http.StatusOK, statuscode.FailToken.Code, statuscode.FailToken.Msg, nil)
 			c.Abort()
 			return
 		} else {
@@ -32,10 +31,7 @@ func JWTAuth() gin.HandlerFunc {
 		}
 		fmt.Println(token)
 		if token == "" {
-			c.JSON(http.StatusOK, gin.H{
-				"status": -1,
-				"msg":    "无效token，无权限访问",
-			})
+			response.ReturnJSON(c, http.StatusOK, statuscode.FailToken.Code, statuscode.FailToken.Msg, nil)
 			c.Abort()
 			return
 		}
@@ -47,25 +43,17 @@ func JWTAuth() gin.HandlerFunc {
 		claims, err := j.ParseToken(token)
 		if err != nil {
 			if err == TokenExpired {
-				c.JSON(http.StatusOK, gin.H{
-					"status": -1,
-					"msg":    "授权已过期",
-				})
+				response.ReturnJSON(c, http.StatusOK, statuscode.ExprieToken.Code, statuscode.ExprieToken.Msg, nil)
 				fmt.Println(err)
 				c.Abort()
 				return
 			}
-			c.JSON(http.StatusOK, gin.H{
-				"status": -1,
-				"msg":    err.Error(),
-			})
+			response.ReturnJSON(c, http.StatusOK, statuscode.FailToken.Code, statuscode.FailToken.Msg, nil)
 			c.Abort()
 			return
 		}
 		// 继续交由下一个路由处理,并将解析出的信息传递下去
-		c.Set("usrname", claims.Name)
-
-		// c.Keys["claims"] = claims
+		c.Set("mobile", claims.Name)
 	}
 }
 

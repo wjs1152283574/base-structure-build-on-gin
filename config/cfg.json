@@ -1,5 +1,5 @@
 {
-    "Debug":false,
+    "Debug":true,
     "DbType":"mysql",
     "Port":":9000",
     "AllowCrossDomain":true,
