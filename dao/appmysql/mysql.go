@@ -19,6 +19,7 @@ var DB *gorm.DB
 
 func init() {
 	InitMysql()
+	fmt.Println("所有被编译器发现的 init 函数都会安排在 main 函数之前执行 。init 函数用在设置包、初始化变量或其他要在程序运行前优先完成的引导工作。")
 }
 
 // InitMysql 初始化数据库连接

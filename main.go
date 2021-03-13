@@ -4,9 +4,7 @@ import (
 	"goweb/dao/appmysql"
 	"goweb/routers"
 	"goweb/utils/parsecfg"
-	_ "goweb/utils/parsecfg"
 	"goweb/utils/timer"
-	_ "goweb/utils/ws"
 )
 
 func main() {
