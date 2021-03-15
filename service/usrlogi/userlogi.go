@@ -16,16 +16,16 @@ import (
 
 // SignUpReq 新建用户请求数据
 type SignUpReq struct {
-	Name   string  `json:"username" binding:"required"`
-	Pwd    string  `json:"password" binding:"required"`
-	Mobile *string `json:"mobile" binding:"required"`
+	Name   string `json:"username" binding:"required"`
+	Pwd    string `json:"password" binding:"required"`
+	Mobile string `json:"mobile" binding:"required"`
 }
 
 // SignUp  新建用户
 func SignUp(c *gin.Context) {
 	var postData SignUpReq
 	if err := c.ShouldBind(&postData); err != nil {
-		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, nil)
 		return
 	}
 	var me appuser.User
@@ -35,7 +35,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 	me.Name = postData.Name
-	me.Pwd = passmd5.Base64Md5(*postData.Mobile)
+	me.Pwd = passmd5.Base64Md5(postData.Mobile)
 	var res appuser.ResUser
 	if err := me.Create(&res); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)

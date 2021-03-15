@@ -22,7 +22,7 @@ type User struct {
 	Name     string     `gorm:"not null;unique" json:"username" binding:"required"`
 	Gender   int        `gorm:"default:1" json:"gender"`
 	Pwd      string     `gorm:"not null" json:"password" binding:"required"`
-	Mobile   *string    `gorm:"size:12" json:"mobile" binding:"required"`
+	Mobile   string     `gorm:"size:12" json:"mobile" binding:"required"`
 }
 
 // Msg 消息
@@ -44,7 +44,7 @@ func (u *User) BeforeCreate(scope *gorm.Scope) error {
 
 // Create 创建用户
 func (u *User) Create(res *ResUser) error {
-	return appmysql.DB.Create(u).First(res).Error
+	return appmysql.DB.Create(u).Scan(res).Error
 }
 
 // Create 新建消息
@@ -70,5 +70,5 @@ func (u *User) Get(res *ResUser) error {
 
 // Check 检测用户电话是否存在
 func (u *User) Check() error {
-	return appmysql.DB.Where("mobile = ?", u.Name).First(u).Error
+	return appmysql.DB.Where("mobile = ?", u.Mobile).First(u).Error
 }
