@@ -6,9 +6,9 @@
 package alimsg
 
 import (
+	"crypto/rand"
 	"fmt"
-	"math/rand"
-	"time"
+	"io"
 
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
 )
@@ -16,12 +16,19 @@ import (
 // 封装发送短信功能:
 // 1. 自动生成 6 位数随机码
 // 2. 发送到阿里短信api
+var table = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
 
-// Code 生成6位数随机码-- string
+// Code 生成6位数随机码-- string 不能简单的使用当前时间并且截取6位, 当操作的时间近似相同时,返回的验证码也是相同的
 func Code() (res string) {
-	rand.Seed(time.Now().Unix())
-	rnd := rand.New(rand.NewSource(time.Now().Unix()))
-	res = fmt.Sprintf("%06v", rnd.Intn(1000000))
+	b := make([]byte, 6)
+	n, err := io.ReadAtLeast(rand.Reader, b, 6)
+	if n != 6 {
+		panic(err)
+	}
+	for i := 0; i < len(b); i++ {
+		b[i] = table[int(b[i])%len(table)]
+	}
+	res = string(b)
 	return
 }
 
