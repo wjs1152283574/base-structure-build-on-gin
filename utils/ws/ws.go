@@ -172,12 +172,13 @@ func TranslateMessage(msg TranstMsg, from map[string]string) (res TranstMsgRever
 }
 
 // CheckInlineOutlingSend 功能: 检测在线/离线; 发送数据给指定用户  传入: 需要发送用户切片/原始数据(需要改造为指定 msg_type再传入)
-func CheckInlineOutlingSend(mobiles []string, msg TranstMsg) {
+func CheckInlineOutlingSend(mobiles []string, msg TranstMsg, flag bool) { // 根据flag 可以判断哪些消息需要存储
 	conn := appredis.RedisDefaultPool.Get() // 获取redis链接
 	defer conn.Close()
+	// 在循环之前先完成序列化
+	res, _ := json.Marshal(TranslateMessage(msg, GetInfoByMobile([]string{msg.From}, 1)[0])) // 改变from 类型 并返回最新数据体格式
 	for _, v := range mobiles {
 		if _, ok := WebsocketManager.Group[v]; ok { // 在线
-			res, _ := json.Marshal(TranslateMessage(msg, GetInfoByMobile([]string{msg.From}, 1)[0])) // 改变from 类型 并返回最新数据体格式
 			_ = WebsocketManager.Group[v][v].Socket.WriteMessage(websocket.TextMessage, res)         // 直接 发送到指定用户连接通道
 		} else { // 离线  : 按原样存储  又或者: 目标用户登录的事另外一台集群的服务器(则需要把消息存入redis中转并发给目标服务器处理)
 			msg.To = []string{v} // 因为数据分发都是发送给 msg.To
