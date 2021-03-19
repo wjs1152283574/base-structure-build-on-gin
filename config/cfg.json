@@ -43,6 +43,6 @@
         "ReConnectInterval":1
     },
     "Timer":{
-        "Store":"*/5 * * * * ?"  
+        "Store":"* * * * * *"  
     }
 }
