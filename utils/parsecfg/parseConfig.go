@@ -62,7 +62,7 @@ type RedisCfg struct {
 
 // TimerCfg 定时器配置
 type TimerCfg struct {
-	Stores string
+	Store string   // 定时器时间间隔字符串
 }
 
 func init() {
