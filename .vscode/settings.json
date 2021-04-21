@@ -1,58 +1,52 @@
 {
-    // 控制自动保存未保存的编辑器。有关自动保存的详细信息，请参阅[此处](https://code.visualstudio.com/docs/editor/codebasics#_save-auto-save)。
-//  - off: 未保存的编辑器永远不会自动保存。
-//  - afterDelay: 将在配置的 "#files.autoSaveDelay#" 后自动保存未保存的编辑器。
-//  - onFocusChange: 当编辑器失去焦点时，将自动保存未保存的编辑器。
-//  - onWindowChange: 当窗口失去焦点时，将自动保存未保存的编辑器。
-"files.autoSave": "onFocusChange",
-
-// 控制字体大小(像素)。
-"editor.fontSize": 18,
-
-// 控制字体系列。
-"editor.fontFamily": "Menlo, Monaco, 'Courier New', monospace",
-
-// 一个制表符等于的空格数。在 `editor.detectIndentation` 启用时，根据文件内容，该设置可能会被覆盖。
-"editor.tabSize": 4,
-
-// 控制编辑器在空白字符上显示符号的方式。
-//  - none
-//  - boundary: 呈现空格字符(字词之间的单个空格除外)。
-//  - selection: 仅在选定文本上呈现空白字符。
-//  - trailing: 仅呈现尾随空格字符
-//  - all
-"editor.renderWhitespace": "selection",
-
-// 控制光标样式。
-"editor.cursorStyle": "line",
-
-// 在通过鼠标添加多个光标时使用的修改键。“转到定义”和“打开链接”功能所需的鼠标动作将会相应调整，不与多光标修改键冲突。[阅读详细信息](https://code.visualstudio.com/docs/editor/codebasics#_multicursor-modifier)。
-//  - ctrlCmd: 映射为 `Ctrl` (Windows 和 Linux) 或 `Command` (macOS)。
-//  - alt: 映射为 `Alt` (Windows 和 Linux) 或 `Option` (macOS)。
-"editor.multiCursorModifier": "alt",
-
-// 按 `Tab` 键时插入空格。该设置在 `editor.detectIndentation` 启用时根据文件内容可能会被覆盖。
-"editor.insertSpaces": true,
-
-// 控制折行的方式。
-//  - off: 永不换行。
-//  - on: 将在视区宽度处换行。
-//  - wordWrapColumn: 在 `editor.wordWrapColumn` 处折行。
-//  - bounded: 在视区宽度和 `editor.wordWrapColumn` 中的较小值处折行。
-"editor.wordWrap": "off",
-
-// 配置用于排除文件和文件夹的 glob 模式。例如，文件资源管理器根据此设置决定要显示或隐藏的文件和文件夹。请参阅 `search.exclude` 设置以定义特定于搜索的排除。在[此处](https://code.visualstudio.com/docs/editor/codebasics#_advanced-search-options)详细了解 glob 模式。
-"files.exclude": {
-  "**/.git": true,
-  "**/.svn": true,
-  "**/.hg": true,
-  "**/CVS": true,
-  "**/.DS_Store": true
-},
-
-// 配置语言的文件关联 (如: `"*.extension": "html"`)。这些关联的优先级高于已安装语言的默认关联。
-"files.associations": {},
-
-// 控制打开的编辑器是否显示为预览。预览编辑器不会保持打开，在将其显式设置为保持打开(例如通过双击或编辑)前将会重用它，其字体样式为斜体。
-"workbench.editor.enablePreview": true
+  "breadcrumbs.enabled": true,
+  "editor.detectIndentation": true,
+  "editor.tabSize": 4,
+  // "editor.wordWrap":"bounded",
+  "editor.fontSize": 16,
+  "workbench.tree.indent": 18,
+  "editor.autoIndent":"full",
+  "files.autoSave": "onFocusChange",
+  "editor.renderWhitespace": "boundary",
+  "editor.cursorBlinking": "smooth",
+  "editor.minimap.renderCharacters": false,
+  "editor.fontFamily": "'Fira Code', 'Droid Sans Mono', 'Courier New', monospace, 'Droid Sans Fallback'",
+  "editor.fontLigatures": true,
+  "explorer.confirmDragAndDrop": false,
+  "extensions.autoUpdate": false,
+  "files.insertFinalNewline": true,
+  "git.autofetch": false,
+  "git.path": "F:\\Program Files\\Git\\cmd\\git.exe",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true
+  },
+  "typescript.locale": "en",
+  "window.titleBarStyle": "custom",
+  "window.title": "${dirty}${activeEditorMedium}${separator}${rootName}",
+  "window.zoomLevel": 1,
+  "workbench.activityBar.visible": true,
+  "workbench.colorTheme": "One Dark Pro",
+  "workbench.iconTheme": "vscode-icons",
+  
+  "eslint.autoFixOnSave": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "vue"
+  ],
+  "vsicons.projectDetection.autoReload": true,
+  "vsicons.dontShowNewVersionMessage": true,
+  "tslint.autoFixOnSave": true,
+  "debugwrapper.wrappers": {
+    "default": "console.log('$eSEL', $SEL)"
+  },
+  "prettier.tslintIntegration": true,
+  "cSpell.userWords": [
+    "Unmount"
+  ],
+  "jest.autoEnable": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
 }

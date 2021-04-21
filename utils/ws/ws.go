@@ -179,7 +179,7 @@ func CheckInlineOutlingSend(mobiles []string, msg TranstMsg, flag bool) { // 根
 	res, _ := json.Marshal(TranslateMessage(msg, GetInfoByMobile([]string{msg.From}, 1)[0])) // 改变from 类型 并返回最新数据体格式
 	for _, v := range mobiles {
 		if _, ok := WebsocketManager.Group[v]; ok { // 在线
-			_ = WebsocketManager.Group[v][v].Socket.WriteMessage(websocket.TextMessage, res)         // 直接 发送到指定用户连接通道
+			_ = WebsocketManager.Group[v][v].Socket.WriteMessage(websocket.TextMessage, res) // 直接 发送到指定用户连接通道
 		} else { // 离线  : 按原样存储  又或者: 目标用户登录的事另外一台集群的服务器(则需要把消息存入redis中转并发给目标服务器处理)
 			msg.To = []string{v} // 因为数据分发都是发送给 msg.To
 			res, _ := json.Marshal(msg)
@@ -225,7 +225,7 @@ func GetGroupDetailsFromRedis(msg TranstMsg) (results GroupsDedials, err error) 
 	if ok := appredis.Exists(msg.Group); !ok {
 		msg.MsgType = 500 // 修改为与前端约定好的状态码: 500 不存在 群组
 		msg.Msg = "不存在群组"
-		CheckInlineOutlingSend([]string{msg.From}, msg)
+		CheckInlineOutlingSend([]string{msg.From}, msg, false) // 报错信息不存储
 		err = errors.New("不存在群组")
 	} else {
 		if res, r := appredis.Get(msg.Group); r != nil {
@@ -246,20 +246,20 @@ func StoreCurrenGroups(gn string, g GroupsDedials) error {
 	return err
 }
 
-// 新建分组存入redis
-func storeGroups(msg TranstMsg, flag bool) error {
-	conn := appredis.RedisDefaultPool.Get() // 获取redis链接
-	defer conn.Close()
-	var stores = make(map[string]interface{})
-	stores["group"] = msg.Group
-	stores["belong"] = msg.To
-	stores["type"] = msg.GroupType
-	stores["group_name"] = msg.GroupName
-	stores["add"] = flag
-	r, _ := json.Marshal(stores)
-	_, err := conn.Do("LPUSH", "groups", r) // 将新建组存入redis,等待入库mysql
-	return err
-}
+// // storeGroups 新建分组存入redis
+// func storeGroups(msg TranstMsg, flag bool) error {
+// 	conn := appredis.RedisDefaultPool.Get() // 获取redis链接
+// 	defer conn.Close()
+// 	var stores = make(map[string]interface{})
+// 	stores["group"] = msg.Group
+// 	stores["belong"] = msg.To
+// 	stores["type"] = msg.GroupType
+// 	stores["group_name"] = msg.GroupName
+// 	stores["add"] = flag
+// 	r, _ := json.Marshal(stores)
+// 	_, err := conn.Do("LPUSH", "groups", r) // 将新建组存入redis,等待入库mysql
+// 	return err
+// }
 
 // 消息存入redis: 可进行额外操作
 func storeMsgToRedis(msg []byte) error { // 函数执行完毕返回即释放redis连接,如果在Write方法里面创建连接的话 要用户退出长连接才会释放redis连接

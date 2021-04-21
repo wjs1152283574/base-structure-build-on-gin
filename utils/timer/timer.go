@@ -34,5 +34,5 @@ var Conrs *cron.Cron
 func init() {
 	Conrs = cron.New() // 定时任务
 	Conrs.Start()
-	Conrs.AddJob(parsecfg.GlobalConfig.Timer.Stores, &StoreMsg{})
+	Conrs.AddJob(parsecfg.GlobalConfig.Timer.Store, &StoreMsg{})
 }
