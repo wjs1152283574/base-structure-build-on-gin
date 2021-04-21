@@ -32,6 +32,20 @@ func Code() (res string) {
 	return
 }
 
+// OrderCode 生成12位订单号
+func OrderCode() (res string) {
+	b := make([]byte, 12)
+	n, err := io.ReadAtLeast(rand.Reader, b, 12)
+	if n != 12 {
+		panic(err)
+	}
+	for i := 0; i < len(b); i++ {
+		b[i] = table[int(b[i])%len(table)]
+	}
+	res = "zh" + string(b)
+	return
+}
+
 // SendMsg 发送短信
 func SendMsg(moblie, Code string) (code int) {
 	client, err := dysmsapi.NewClientWithAccessKey("******", "********", "********")
