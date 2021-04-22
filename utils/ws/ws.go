@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"goweb/dao/appredis"
+	"goweb/utils/alimsg"
 	"goweb/utils/customerjwt"
+	"goweb/utils/tool"
 	"log"
 	"net/http"
 	"sync"
@@ -16,15 +18,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// 初始化websocket各项服务
 func init() {
 	go WebsocketManager.Start()
-	go WebsocketManager.SendService()
-	go WebsocketManager.SendService()
-	go WebsocketManager.SendGroupService()
-	go WebsocketManager.SendGroupService()
-	go WebsocketManager.SendAllService()
-	go WebsocketManager.SendAllService()
 }
 
 // TranstMsg 客户端 > 服务端
@@ -33,6 +28,7 @@ type TranstMsg struct {
 	To          []string   `json:"to"`
 	Group       string     `json:"group"`
 	GroupName   string     `json:"group_name"`
+	GroupIcon   string     `json:"group_icon"` // 群图标
 	GroupType   int        `json:"group_type"`
 	Msg         string     `json:"msg"`
 	Time        *time.Time `json:"time"`
@@ -46,6 +42,7 @@ type TranstMsgReverse struct {
 	To          []string          `json:"to"`
 	Group       string            `json:"group"`
 	GroupName   string            `json:"group_name"`
+	GroupIcon   string            `json:"group_icon"` // 群图标
 	GroupType   int               `json:"group_type"`
 	Msg         string            `json:"msg"`
 	Time        *time.Time        `json:"time"`
@@ -55,7 +52,7 @@ type TranstMsgReverse struct {
 
 // Manager 所有 websocket 信息
 type Manager struct {
-	Group                   map[string]map[string]*Client
+	Group                   map[string]*Client // {xx:{cc:client,zz:client,ss:client}}
 	groupCount, clientCount uint
 	Lock                    sync.Mutex
 	Register, UnRegister    chan *Client
@@ -66,9 +63,9 @@ type Manager struct {
 
 // Client 单个 websocket 信息
 type Client struct {
-	ID, Group string
-	Socket    *websocket.Conn
-	Message   chan []byte
+	ID      string
+	Socket  *websocket.Conn
+	Message chan []byte
 }
 
 // MessageData 单个发送数据信息
@@ -92,15 +89,27 @@ type BroadCastMessageData struct {
 func (c *Client) Read() {
 	defer func() {
 		WebsocketManager.UnRegister <- c
-		log.Printf("client [%s] disconnect", c.ID)
+		log.Printf("Read:client [%s] disconnect", c.ID)
 		if err := c.Socket.Close(); err != nil {
-			log.Printf("client [%s] disconnect err: %s", c.ID, err)
+			// log.Printf("client [%s] 服务端断开连接出错 READ: %s", c.ID, err)
 		}
 	}()
 	for {
 		messageType, message, err := c.Socket.ReadMessage() // 从客户端那边发送过来的数据再写入Message通道(后台消息分发是程序直接往Message通道里面直接写入数据)
 		if err != nil || messageType == websocket.CloseMessage {
-			break
+			if err != nil {
+				fmt.Println(err, "客户端 主动断开连接")
+			} else {
+				fmt.Println(err, "服务端**** 主动断开连接")
+			}
+			return
+		}
+		if len(WebsocketManager.Group) > 0 {
+			var s []string
+			for k, _ := range WebsocketManager.Group {
+				s = append(s, k)
+			}
+			log.Printf("在线人数:%d---存活链接:%d--%#v", WebsocketManager.groupCount, WebsocketManager.groupCount, s)
 		}
 		log.Printf("client [%s] receive message: %s", c.ID, string(message))
 		c.Message <- message // 写入channel,等待写入对应长连接通道
@@ -115,11 +124,12 @@ type GroupsDedials struct {
 	NotName    int      `json:"not_name"`    // 0 允许匿名  1 不允许
 	Status     int      `json:"status"`      // 1 正常  2 锁定
 	NeedAccess int      `json:"need_access"` // 0 无需审核  1 需审核
+	Nums       int      `json:"nums"`        // 群员总数
 	To         []string `json:"to"`          // 群员电话列表
 }
 
-// newGroupsDedials 每个分组的详细信息构造函数
-func newGroupsDedials(to []string) GroupsDedials {
+// NewGroupsDedials XXX
+func NewGroupsDedials(to []string, nums int) GroupsDedials {
 	return GroupsDedials{
 		NotTalk:    0,
 		CanConn:    0,
@@ -127,14 +137,32 @@ func newGroupsDedials(to []string) GroupsDedials {
 		NotName:    0,
 		Status:     1,
 		NeedAccess: 0,
+		Nums:       nums,
 		To:         to,
 	}
 }
 
-// Groups 所有用户组: 优化后已经把分组信息存入redis,已经不用本地存储Groups了,如果确定不需要集群的话使用本地存储会更快(不需要连接redis取值)
-// var Groups = make(map[string]GroupsDedials)
+// NewTranstMsg 消息体构造函数
+func NewTranstMsg(from, gid, gname, gicon, msg, ctype string, to []string, msgtype int) *TranstMsg {
+	t := time.Now()
+	return &TranstMsg{
+		From:        from,
+		To:          to,
+		Group:       gid,
+		GroupName:   gname,
+		GroupIcon:   gicon,
+		GroupType:   1,
+		Msg:         msg,
+		Time:        &t,
+		ContentType: ctype,
+		MsgType:     int64(msgtype),
+	}
+}
 
-// GetInfoByMobile 根据电话获取昵称/头像(在http接口中,用户更改/上传昵称/头像时会入库并存入redis,所以此处直接从redis中查找昵称跟头像)
+// Groups 所有用户组
+var Groups = make(map[string]GroupsDedials)
+
+// GetInfoByMobile 根据电话获取昵称/头像
 func GetInfoByMobile(mobile []string, flag int) (res []map[string]string) {
 	item := make(map[string]string)
 	if flag == 1 { // from
@@ -167,24 +195,33 @@ func TranslateMessage(msg TranstMsg, from map[string]string) (res TranstMsgRever
 	res.Time = msg.Time
 	res.ContentType = msg.ContentType
 	res.MsgType = msg.MsgType
+	res.GroupIcon = msg.GroupIcon
 	res.From = from
 	return
 }
 
 // CheckInlineOutlingSend 功能: 检测在线/离线; 发送数据给指定用户  传入: 需要发送用户切片/原始数据(需要改造为指定 msg_type再传入)
-func CheckInlineOutlingSend(mobiles []string, msg TranstMsg, flag bool) { // 根据flag 可以判断哪些消息需要存储
+func CheckInlineOutlingSend(mobiles []string, msg TranstMsg, flag bool) {
 	conn := appredis.RedisDefaultPool.Get() // 获取redis链接
 	defer conn.Close()
-	// 在循环之前先完成序列化
-	res, _ := json.Marshal(TranslateMessage(msg, GetInfoByMobile([]string{msg.From}, 1)[0])) // 改变from 类型 并返回最新数据体格式
+	if flag { // 使用一个布尔值来判断是否要存入数据
+		message, _ := json.Marshal(msg)
+		_ = storeMsgToRedis(message) // 消息存储
+	}
+	res, er := json.Marshal(TranslateMessage(msg, GetInfoByMobile([]string{msg.From}, 1)[0])) // 改变from 类型 并返回最新数据体格式
+	fmt.Print("发送前序列化出错:", er, "发送至列表:", mobiles, "\n")
 	for _, v := range mobiles {
 		if _, ok := WebsocketManager.Group[v]; ok { // 在线
-			_ = WebsocketManager.Group[v][v].Socket.WriteMessage(websocket.TextMessage, res) // 直接 发送到指定用户连接通道
+			msg.To = []string{}                                                              // 暂时先这样, 后期会去掉to 属性 , 因为人多的话很长
+			ert := WebsocketManager.Group[v].Socket.WriteMessage(websocket.TextMessage, res) // 直接 发送到指定用户连接通道
+			log.Printf("用户%s在线，发送消息%s,err:%#v", v, msg.Msg, ert)
 		} else { // 离线  : 按原样存储  又或者: 目标用户登录的事另外一台集群的服务器(则需要把消息存入redis中转并发给目标服务器处理)
 			msg.To = []string{v} // 因为数据分发都是发送给 msg.To
 			res, _ := json.Marshal(msg)
-			_, err := conn.Do("RPUSH", v+":history", res) // 历史消息格式
-			fmt.Println(err, "store history msg to redis fail--casso")
+			log.Printf("用户%s离线，存储消息%s", v, msg.Msg)
+			if _, err := conn.Do("RPUSH", v+":history", res); err != nil { // 历史消息格式
+				fmt.Println(err, "store msg to redis fail--casso")
+			}
 		}
 	}
 }
@@ -192,27 +229,70 @@ func CheckInlineOutlingSend(mobiles []string, msg TranstMsg, flag bool) { // 根
 // 写信息，从 channel 变量 Send 中读取数据写入 websocket 连接
 func (c *Client) Write() { // 解析客户端发来的数据,在此分发数据到对应的长连接通道
 	defer func() {
-		log.Printf("client [%s] disconnect", c.ID)
-		if err := c.Socket.Close(); err != nil {
-			log.Printf("client [%s] disconnect err: %s", c.ID, err)
-		}
+		log.Printf("Write:client [%s] disconnect", c.ID)
+		// WebsocketManager.UnRegister <- c
+		// if err := c.Socket.Close(); err != nil {
+		// 	// log.Printf("client [%s] 服务端断开连接出错 WRITE: %s", c.ID, err)
+		// }
 	}()
-	// 优化思路:1. 代码封装拆分(主流业务逻辑清晰) ; 2. 增加Groups存储信息(禁言/审核等flag) 3. 数据接入统一改变frmo(数据发送给用户时from需要有昵称跟头像信息,而客户端发送的数据的from只有电话号码所以需要转换) ; 4. 数据统一存入redis,方便集群; 5. 定义清晰的msg_type区分
+	// 优化思路:1. 代码封装拆分(主流业务逻辑清晰) ; 2. 增加Groups存储信息(禁言/审核等flag) 3. 数据接入统一改变frmo ; 4. 数据统一存入redis,方便集群; 5. 定义清晰的msg_type区分
 	for {
 		select {
 		case message, ok := <-c.Message:
-			if !ok {
-				_ = c.Socket.WriteMessage(websocket.CloseMessage, []byte{})
+			if !ok { // 通道 关闭且无值
+				_ = c.Socket.WriteMessage(websocket.CloseMessage, []byte("write---error close"))
 				return
 			}
-			// 注意: 消息确认分发后会改变form的格式,不再是string类型; 此时再走到 Write方法里面就会报:反序列化失败,也正好不走里面的逻辑,所以就留下了这个错误
 			var msg TranstMsg
 			if err := json.Unmarshal(message, &msg); err == nil {
-				_ = storeMsgToRedis(message) // 消息存储
-				// 这里可以根据接收到 的消息进行正确的消息分发: 需要用到的方法已经封装好
+				if msg.Group == "" { // 认为是刚发起聊天 || 添加好友
+					if msg.MsgType == 4 { // 为添加好友请求,需将改请求推送给目标用户
+						msg.MsgType = 204                          // 修改为与前端约定好的状态码: 204 为添加好友请求
+						CheckInlineOutlingSend(msg.To, msg, false) // 发送消息 不包括自己
+					} else if msg.MsgType == 1 { // 正常邀请聊天 : 这里看判断一下 本次一次性邀请是否超过 群组会员数量限制
+						if len(msg.To) > 50 {
+							msg.MsgType = 500 // 修改为与前端约定好的状态码: 500 为超出群聊人数上限
+							msg.Msg = "超出群聊人数上限"
+							CheckInlineOutlingSend([]string{msg.From}, msg, false)
+						} else { // 目前仅 会邀请私聊, 创建群聊会使用http 创建
+							gn := msg.From + ":chat" + alimsg.Code() // 生成随机组名
+							msg.To = append(msg.To, msg.From)        // 组所有成员: 包括自己
+							msg.Group = gn
+							_ = StoreCurrenGroups(gn, NewGroupsDedials(msg.To, 2)) // 改造Groups 并存入redis
+							_ = storeGroups(msg, false, false)                     // 存储新建分组
+							msg.MsgType = 101                                      // 修改为与前端约定好的状态码: 101 为邀请聊天
+							// 并且需要把组名发给相关人员-- 之后聊天用组名
+							CheckInlineOutlingSend(msg.To, msg, false) // 发送消息 包括自己
+						}
+					}
+				} else {
+					if msg.MsgType == 1 { // 正常消息通讯
+						if details, err := GetGroupDetailsFromRedis(msg); err == nil { // 从redis中取出本组所有群员
+							msg.MsgType = 200
+							if details.NotTalk == 1 {
+								msg.MsgType = 500 // 修改为与前端约定好的状态码: 500 不存在 群组
+								msg.Msg = "全体禁言"
+								CheckInlineOutlingSend([]string{msg.From}, msg, false)
+							} else if details.Status == 2 {
+								msg.MsgType = 500 // 修改为与前端约定好的状态码: 500 不存在 群组
+								msg.Msg = "群已被锁定"
+								CheckInlineOutlingSend([]string{msg.From}, msg, false)
+							} else {
+								msg.GroupType = 3                             // 3 是私聊
+								CheckInlineOutlingSend(details.To, msg, true) // 发送消息 包括自己:所有群员
+							}
+						}
+					} else {
+						// 除了 1 之外都是其他的讯息类型,前端可以自定义(以获得对方是否已阅读/是否正在输入等讯息),建议100以内
+						// 基本信息都需要传: groupid groupname msgtype 等
+						if details, err := GetGroupDetailsFromRedis(msg); err == nil {
+							CheckInlineOutlingSend(details.To, msg, false) // 通知目标
+						}
+					}
+				}
 			} else {
 				// 数据无法反序列化: 关闭连接
-				err = c.Socket.WriteMessage(websocket.CloseMessage, []byte{})
+				c.Socket.WriteMessage(websocket.TextMessage, []byte("数据格式有误,服务端主动断开连接"))
 				fmt.Println(err, "数据无法反序列化: 关闭连接--casso")
 				return
 			}
@@ -225,7 +305,7 @@ func GetGroupDetailsFromRedis(msg TranstMsg) (results GroupsDedials, err error) 
 	if ok := appredis.Exists(msg.Group); !ok {
 		msg.MsgType = 500 // 修改为与前端约定好的状态码: 500 不存在 群组
 		msg.Msg = "不存在群组"
-		CheckInlineOutlingSend([]string{msg.From}, msg, false) // 报错信息不存储
+		CheckInlineOutlingSend([]string{msg.From}, msg, false)
 		err = errors.New("不存在群组")
 	} else {
 		if res, r := appredis.Get(msg.Group); r != nil {
@@ -241,25 +321,30 @@ func GetGroupDetailsFromRedis(msg TranstMsg) (results GroupsDedials, err error) 
 func StoreCurrenGroups(gn string, g GroupsDedials) error {
 	conn := appredis.RedisDefaultPool.Get() // 获取redis链接
 	defer conn.Close()
+	fmt.Println(tool.ParseSlicess(g.To))
+	g.To = tool.ParseSlicess(g.To)
 	res, _ := json.Marshal(g)
 	_, err := conn.Do("set", gn, res) // 将新分组存入redis
+	// fmt.Println(err, "casocasocaoscoasc")
 	return err
 }
 
-// // storeGroups 新建分组存入redis
-// func storeGroups(msg TranstMsg, flag bool) error {
-// 	conn := appredis.RedisDefaultPool.Get() // 获取redis链接
-// 	defer conn.Close()
-// 	var stores = make(map[string]interface{})
-// 	stores["group"] = msg.Group
-// 	stores["belong"] = msg.To
-// 	stores["type"] = msg.GroupType
-// 	stores["group_name"] = msg.GroupName
-// 	stores["add"] = flag
-// 	r, _ := json.Marshal(stores)
-// 	_, err := conn.Do("LPUSH", "groups", r) // 将新建组存入redis,等待入库mysql
-// 	return err
-// }
+// 新建分组存入redis
+func storeGroups(msg TranstMsg, flag, flag2 bool) error {
+	conn := appredis.RedisDefaultPool.Get() // 获取redis链接
+	defer conn.Close()
+	var stores = make(map[string]interface{})
+	stores["group"] = msg.Group
+	stores["belong"] = msg.To
+	stores["type"] = msg.GroupType
+	stores["group_name"] = msg.GroupName // 组名
+	stores["group_icon"] = msg.GroupIcon // 图标
+	stores["add"] = flag
+	stores["del"] = flag2
+	r, _ := json.Marshal(stores)
+	_, err := conn.Do("LPUSH", "groups", r) // 将新建组存入redis,等待入库mysql
+	return err
+}
 
 // 消息存入redis: 可进行额外操作
 func storeMsgToRedis(msg []byte) error { // 函数执行完毕返回即释放redis连接,如果在Write方法里面创建连接的话 要用户退出长连接才会释放redis连接
@@ -276,83 +361,33 @@ func (manager *Manager) Start() {
 		select {
 		// 注册
 		case client := <-manager.Register:
-			log.Printf("client [%s] connect", client.ID)
-			// log.Printf("register client [%s] to group [%s]", client.ID, client.Group)
-			manager.Lock.Lock()                     // 加锁
-			if manager.Group[client.Group] == nil { // 如果是新的分组,则创建该新分组
-				manager.Group[client.Group] = make(map[string]*Client) // 创建一个总管(manager)级别的分组, 但此时分组内部还是没有对应数据,只是make了内存地址
-				manager.groupCount++                                   // 分组数自增
+			log.Printf("client: [%s] **注册********************connect****************\n", client.ID)
+			manager.Lock.Lock()                         // 加锁
+			if _, ok := manager.Group[client.ID]; !ok { // 如果是新的分组,则创建该新分组
+				manager.Group[client.ID] = client // 创建一个总管(manager)级别的分组, 但此时分组内部还是没有对应数据,只是make了内存地址
+				manager.groupCount++              // 分组即链接
+			} else { // 已有链接存在
+				ert := WebsocketManager.Group[client.ID].Socket.WriteMessage(websocket.TextMessage, []byte("new connect,force disconnected!"))
+				client.Socket.Close() //  服务端主动关闭连接
+				fmt.Println(ert, "注册时已存在在线相同账号，强制离线！！！")
 			}
-			// 至此, 已经没有新分组的可能
-			manager.Group[client.Group][client.ID] = client // {"12":{"17620439807":client,"17620439808":client,"17620439809":client}}
-			manager.clientCount++                           // 长链接数自增-- 即 在线人数
-			manager.Lock.Unlock()                           // 解锁
-			appredis.SetHash("onlineUser", fmt.Sprint(manager.clientCount))
+			manager.Lock.Unlock() // 解锁
+			appredis.SetHash("onlineUser", fmt.Sprint(manager.groupCount))
 		// 注销
 		case client := <-manager.UnRegister:
-			log.Printf("unregister client [%s] from group [%s]", client.ID, client.Group)
-			conn := appredis.RedisDefaultPool.Get() // 获取redis链接
-			defer conn.Close()
-			conn.Do("SADD", "underline", client.ID) // 下线人员记录: 上线时查找相应离线 消息
-			manager.Lock.Lock()
-			if _, ok := manager.Group[client.Group]; ok {
-				if _, ok := manager.Group[client.Group][client.ID]; ok {
-					close(client.Message)
-					delete(manager.Group[client.Group], client.ID)
-					manager.clientCount--
-					if len(manager.Group[client.Group]) == 0 {
-						//log.Printf("delete empty group [%s]", client.Group)
-						delete(manager.Group, client.Group)
-						manager.groupCount--
-						appredis.SetHash("onlineUser", fmt.Sprint(manager.clientCount))
-					}
-
-				}
+			log.Printf("client: [%s] **注销**************disconnect****************\n", client.ID)
+			manager.Lock.Lock() // 加锁
+			appredis.SetArr("underline", client.ID)
+			if _, ok := manager.Group[client.ID]; ok {
+				close(client.Message) // 在此关闭通道, 接可以同步结束Write 协程 (退出死循环监听)
+				// manager.Group[client.ID].Socket.Close()                        // 服务端关闭链接
+				delete(manager.Group, client.ID)                               // 删除manager
+				manager.groupCount--                                           // 在线人数 --
+				appredis.SetHash("onlineUser", fmt.Sprint(manager.groupCount)) // 写入下线人员
+			} else {
+				// fmt.Println("注销失败----clientID 查找失败")
 			}
 			manager.Lock.Unlock()
-		}
-	}
-}
-
-// SendService 处理单个 client 发送数据 : 共用Write 方法来给通道写入数据
-func (manager *Manager) SendService() {
-	for {
-		select {
-		case data := <-manager.Message:
-			if groupMap, ok := manager.Group[data.Group]; ok { // 在线 才将消息加入队列
-				if conn, ok := groupMap[data.ID]; ok { // 存在 该链接才 将消息加入队列
-					conn.Message <- data.Message
-				}
-			}
-		}
-	}
-}
-
-// SendGroupService 处理 group 广播数据
-func (manager *Manager) SendGroupService() {
-	for {
-		select {
-		// 发送广播数据到某个组的 channel 变量 Send 中
-		case data := <-manager.GroupMessage:
-			if groupMap, ok := manager.Group[data.Group]; ok {
-				for _, conn := range groupMap {
-					conn.Message <- data.Message
-				}
-			}
-		}
-	}
-}
-
-// SendAllService 处理广播数据
-func (manager *Manager) SendAllService() {
-	for {
-		select {
-		case data := <-manager.BroadCastMessage:
-			for _, v := range manager.Group {
-				for _, conn := range v {
-					conn.Message <- data.Message
-				}
-			}
 		}
 	}
 }
@@ -419,7 +454,7 @@ func (manager *Manager) Info() map[string]interface{} {
 
 // WebsocketManager Manager 初始化 wsManager 管理器
 var WebsocketManager = Manager{
-	Group:            make(map[string]map[string]*Client),
+	Group:            make(map[string]*Client),
 	Register:         make(chan *Client, 128),
 	UnRegister:       make(chan *Client, 128),
 	GroupMessage:     make(chan *GroupMessageData, 128),
@@ -440,23 +475,20 @@ func (manager *Manager) WsClient(ctx *gin.Context) {
 		Subprotocols: []string{ctx.GetHeader("Sec-WebSocket-Protocol")},
 	}
 	var jwt = customerjwt.NewJWT()
-	tokenInfo, err := jwt.ParseToken([]string{ctx.GetHeader("Sec-WebSocket-Protocol")}[0])
-	if err != nil {
+	tokenInfo, tokenErr := jwt.ParseToken([]string{ctx.GetHeader("Sec-WebSocket-Protocol")}[0])
+	if tokenErr != nil {
 		log.Println("token invaliad")
 		return
 	}
-	// fmt.Println(tokenInfo.Name) // token解析出来的认证用户的信息
-	conn, err := upGrader.Upgrade(ctx.Writer, ctx.Request, nil)
-	if err != nil {
+	conn, conErr := upGrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	if conErr != nil {
 		log.Printf("websocket connect error: %s", tokenInfo.Name)
 		return
 	}
-
 	client := &Client{
-		ID:      tokenInfo.Name, // 电话作为唯一的 ID
-		Group:   tokenInfo.Name, // connectors 组: 所有链接用户都在此处
-		Socket:  conn,
-		Message: make(chan []byte, 1024),
+		ID:      tokenInfo.Name,          // 电话作为唯一的 ID
+		Socket:  conn,                    // socket链接
+		Message: make(chan []byte, 1024), // 通道内消息缓存大小
 	}
 
 	manager.RegisterClient(client)
@@ -480,8 +512,7 @@ func (manager *Manager) WsClient(ctx *gin.Context) {
 		// 遍历每条都发送给用户,并删除这个 redis list
 		// 记得处理一下 content-type="history"
 		for _, v := range msglist {
-			r, _ := json.Marshal(v)
-			_ = client.Socket.WriteMessage(websocket.TextMessage, r) // 直接 发送到用户连接通道
+			CheckInlineOutlingSend([]string{client.ID}, v, false)
 		}
 		redisConn.Do("del", client.ID+":history") // 发送完毕,删除
 	} else {
