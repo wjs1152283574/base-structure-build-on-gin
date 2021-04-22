@@ -53,6 +53,15 @@ func SetJSON(key string, data interface{}, time int) error {
 	return nil
 }
 
+// SetArr 列表插入
+func SetArr(key, val string) error {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+
+	_, err := conn.Do("SADD", key, val)
+	return err
+}
+
 // SetHash 设置基础类型
 func SetHash(key, val string) error {
 	conn := RedisDefaultPool.Get()
