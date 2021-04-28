@@ -43,6 +43,9 @@ func OrderCode() (res string) {
 		b[i] = table[int(b[i])%len(table)]
 	}
 	res = "zh" + string(b)
+	if res[0] == '0' {
+		res = Code()
+	}
 	return
 }
 
