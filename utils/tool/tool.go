@@ -36,7 +36,7 @@ func DeledeSlice(slc []string, target string) []string {
 			break
 		}
 	}
-	// ["aa","bb","cc"]  例: index = 2  则: 会超出下标界限
+	// ["aa","bb","cc"]  例: index = 2  则: 会超出下标界限  下面的append
 	if index == len(slc)-1 && len(slc) != 0 { // 删除最后一项
 		slc = slc[:index] // 左包含,右不包含
 	} else {
