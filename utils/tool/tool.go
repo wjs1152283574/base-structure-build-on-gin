@@ -1,12 +1,4 @@
 /*
- * @Author: your name
- * @Date: 2021-01-22 10:57:57
- * @LastEditTime: 2021-03-11 11:34:32
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: /githubStarChat/starChat/utils/tool/tool.go
- */
-/*
  * @Description:常用工具
  * @Author: Casso-Wong
  */
