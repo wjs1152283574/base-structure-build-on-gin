@@ -23,21 +23,27 @@ import (
 var DB *gorm.DB
 
 func init() {
-	InitMysql()
+	if parsecfg.GlobalConfig.Env == "dev" {
+		InitMysql(parsecfg.GlobalConfig.Mysql.Write.Host, parsecfg.GlobalConfig.Mysql.Write.Port, parsecfg.GlobalConfig.Mysql.Write.User, parsecfg.GlobalConfig.Mysql.Write.PassWord, parsecfg.GlobalConfig.Mysql.Write.DataBase, parsecfg.GlobalConfig.Mysql.Write.Charset)
+	}
+	if parsecfg.GlobalConfig.Env == "test" {
+		InitMysql(parsecfg.GlobalConfig.Mysql.Write.HostLive, parsecfg.GlobalConfig.Mysql.Write.PortLive, parsecfg.GlobalConfig.Mysql.Write.User, parsecfg.GlobalConfig.Mysql.Write.PassWord, parsecfg.GlobalConfig.Mysql.Write.DataBase, parsecfg.GlobalConfig.Mysql.Write.Charset)
+	}
+	// you can add other env here
 	fmt.Println("所有被编译器发现的 init 函数都会安排在 main 函数之前执行 。init 函数用在设置包、初始化变量或其他要在程序运行前优先完成的引导工作。")
 }
 
 // InitMysql 初始化数据库连接
-func InitMysql() {
+func InitMysql(host, port, user, pass, dbname, chaset string) {
 	var hp string
 	// 数据链对象--mysql
 	if parsecfg.GlobalConfig.Env == "dev" {
-		hp = net.JoinHostPort(parsecfg.GlobalConfig.Mysql.Write.Host, parsecfg.GlobalConfig.Mysql.Write.Port) // 需要使用这个方法将host/port 拼接起来才能正常运行
+		hp = net.JoinHostPort(host, port) // 需要使用这个方法将host/port 拼接起来才能正常运行
 	}
 	if parsecfg.GlobalConfig.Env == "test" {
-		hp = net.JoinHostPort(parsecfg.GlobalConfig.Mysql.Write.HostLive, parsecfg.GlobalConfig.Mysql.Write.PortLive) // 需要使用这个方法将host/port 拼接起来才能正常运行
+		hp = net.JoinHostPort(host, port) // 需要使用这个方法将host/port 拼接起来才能正常运行
 	}
-	str := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=Local", parsecfg.GlobalConfig.Mysql.Write.User, parsecfg.GlobalConfig.Mysql.Write.PassWord, hp, parsecfg.GlobalConfig.Mysql.Write.DataBase, parsecfg.GlobalConfig.Mysql.Write.Charset)
+	str := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=Local", user, pass, hp, dbname, chaset)
 	fmt.Println(str)
 	db, err := gorm.Open(parsecfg.GlobalConfig.DbType, str)
 	if err != nil {
