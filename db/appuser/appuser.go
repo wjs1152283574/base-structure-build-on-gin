@@ -18,6 +18,8 @@ func init() {
 type User struct {
 	gorm.Model
 	Birthday *time.Time `json:"birthday"`
+	Status   int        `gorm:"default:1" json:"status"`
+	Type     int        `gorm:"default:1" json:"type"`
 	Age      int        `gorm:"default:18" json:"age"`
 	Name     string     `gorm:"not null;unique" json:"username" binding:"required"`
 	Gender   int        `gorm:"default:1" json:"gender"`

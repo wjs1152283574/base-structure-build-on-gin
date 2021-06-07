@@ -36,5 +36,9 @@ func InitAPIRouter() *gin.Engine {
 		v1.POST("/user", userlogi.SignUp)  // 用户注册
 		v1.POST("/login", userlogi.SignIn) // 用户登录
 	}
+	v2 := router.Group("/v2")
+	{
+		v2.POST("/login", userlogi.SignIn) // 用户登录
+	}
 	return router
 }

@@ -92,3 +92,8 @@ func SignIn(c *gin.Context) {
 		"token": token,
 	})
 }
+
+// UserList 用户列表
+func UserList(c *gin.Context) {
+
+}
