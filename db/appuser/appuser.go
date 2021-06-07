@@ -80,3 +80,13 @@ func (u *User) AdminGetList(page, limit int, res *[]User) (count int, err error)
 	appmysql.DB.Model(u).Count(&count)
 	return count, appmysql.DB.Model(u).Limit(limit).Offset((page - 1) * limit).Scan(res).Error
 }
+
+// GetSendAll send all
+type GetSendAll struct {
+	Mobile string `json:"mobile"`
+}
+
+// GetFrontU get for send all
+func (u *User) GetFrontU(res *[]GetSendAll) error {
+	return appmysql.DB.Model(u).Where("deleted_at is null").Scan(res).Error
+}
