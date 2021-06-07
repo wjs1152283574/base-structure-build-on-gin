@@ -1,3 +1,9 @@
+/*
+ * @Author: Casso-Wong
+ * @Date: 2021-06-05 10:13:59
+ * @Last Modified by:   Casso-Wong
+ * @Last Modified time: 2021-06-05 10:13:59
+ */
 package parsecfg
 
 import (
@@ -5,6 +11,8 @@ import (
 
 	"github.com/spf13/viper"
 )
+
+// 解析配置文件
 
 // GlobalConfig 全局配置
 var GlobalConfig EnvCfg
@@ -14,7 +22,12 @@ type EnvCfg struct {
 	Debug            bool
 	DbType           string
 	Port             string
+	SuperUser1       string
+	SuperUser2       string
+	SuperUser3       string
+	Pass             string
 	AllowCrossDomain bool
+	Env              string // "dev":127.0.0.1:9000 "pro":    "test":112.74.179.19
 	Mysql            MysqlCfg
 	Redis            RedisCfg
 	Timer            TimerCfg
@@ -29,8 +42,10 @@ type MysqlCfg struct {
 // MysqlWriteCfg mysql配置
 type MysqlWriteCfg struct {
 	Host            string
+	HostLive        string
 	DataBase        string
 	Port            string
+	PortLive        string
 	PreFix          string
 	User            string
 	PassWord        string
@@ -55,14 +70,17 @@ type MysqlReadCfg struct {
 // RedisCfg redis配置
 type RedisCfg struct {
 	Host      string
+	HostLive  string
 	Port      string
+	PortLive  string
+	Auth      string
 	MaxIdle   int
 	MaxActive int
 }
 
 // TimerCfg 定时器配置
 type TimerCfg struct {
-	Store string   // 定时器时间间隔字符串
+	Store string
 }
 
 func init() {

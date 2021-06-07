@@ -1,14 +1,19 @@
+/*
+ * @Author: Casso-Wong
+ * @Date: 2021-06-04 14:41:27
+ * @Last Modified by:   Casso-Wong
+ * @Last Modified time: 2021-06-04 14:41:27
+ */
 package appmysql
 
 // MYSQL 数据库初始化
 
 import (
 	"fmt"
+	"goweb/utils/parsecfg"
 
 	"net"
 	"time"
-
-	"goweb/utils/parsecfg"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -24,8 +29,14 @@ func init() {
 
 // InitMysql 初始化数据库连接
 func InitMysql() {
+	var hp string
 	// 数据链对象--mysql
-	hp := net.JoinHostPort(parsecfg.GlobalConfig.Mysql.Write.Host, parsecfg.GlobalConfig.Mysql.Write.Port) // 需要使用这个方法将host/port 拼接起来才能正常运行
+	if parsecfg.GlobalConfig.Env == "dev" {
+		hp = net.JoinHostPort(parsecfg.GlobalConfig.Mysql.Write.Host, parsecfg.GlobalConfig.Mysql.Write.Port) // 需要使用这个方法将host/port 拼接起来才能正常运行
+	}
+	if parsecfg.GlobalConfig.Env == "test" {
+		hp = net.JoinHostPort(parsecfg.GlobalConfig.Mysql.Write.HostLive, parsecfg.GlobalConfig.Mysql.Write.PortLive) // 需要使用这个方法将host/port 拼接起来才能正常运行
+	}
 	str := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=Local", parsecfg.GlobalConfig.Mysql.Write.User, parsecfg.GlobalConfig.Mysql.Write.PassWord, hp, parsecfg.GlobalConfig.Mysql.Write.DataBase, parsecfg.GlobalConfig.Mysql.Write.Charset)
 	fmt.Println(str)
 	db, err := gorm.Open(parsecfg.GlobalConfig.DbType, str)
