@@ -74,3 +74,9 @@ func (u *User) Get(res *ResUser) error {
 func (u *User) Check() error {
 	return appmysql.DB.Where("mobile = ?", u.Mobile).First(u).Error
 }
+
+// AdminGetList admin list
+func (u *User) AdminGetList(page, limit int, res *[]User) (count int, err error) {
+	appmysql.DB.Model(u).Count(&count)
+	return count, appmysql.DB.Model(u).Limit(limit).Offset((page - 1) * limit).Scan(res).Error
+}

@@ -3,6 +3,7 @@ package userlogi
 import (
 	"fmt"
 	"goweb/db/appuser"
+	"goweb/utils/contxtverify"
 	"goweb/utils/customerjwt"
 	"goweb/utils/passmd5"
 	"goweb/utils/response"
@@ -95,5 +96,21 @@ func SignIn(c *gin.Context) {
 
 // UserList 用户列表
 func UserList(c *gin.Context) {
-
+	page, limit, err := contxtverify.CheckPageLimit(c)
+	if err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, err)
+		return
+	}
+	var u appuser.User
+	var res []appuser.User
+	if err := contxtverify.CheckAdmin(c, &u); err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.PermitionDenid.Code, statuscode.PermitionDenid.Msg, err)
+		return
+	}
+	count, err := u.AdminGetList(page, limit, &res)
+	if err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		return
+	}
+	response.ReturnJSONPage(c, http.StatusOK, statuscode.PermitionDenid.Code, statuscode.PermitionDenid.Msg, count, res)
 }
