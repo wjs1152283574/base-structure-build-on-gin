@@ -16,7 +16,6 @@
   "extensions.autoUpdate": false,
   "files.insertFinalNewline": true,
   "git.autofetch": false,
-  "git.path": "F:\\Program Files\\Git\\cmd\\git.exe",
   "search.exclude": {
     "**/node_modules": true,
     "**/dist": true
