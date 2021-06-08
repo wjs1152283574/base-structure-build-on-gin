@@ -35,14 +35,8 @@ func init() {
 
 // InitMysql 初始化数据库连接
 func InitMysql(host, port, user, pass, dbname, chaset string) {
-	var hp string
 	// 数据链对象--mysql
-	if parsecfg.GlobalConfig.Env == "dev" {
-		hp = net.JoinHostPort(host, port) // 需要使用这个方法将host/port 拼接起来才能正常运行
-	}
-	if parsecfg.GlobalConfig.Env == "test" {
-		hp = net.JoinHostPort(host, port) // 需要使用这个方法将host/port 拼接起来才能正常运行
-	}
+	hp := net.JoinHostPort(host, port)
 	str := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=Local", user, pass, hp, dbname, chaset)
 	fmt.Println(str)
 	db, err := gorm.Open(parsecfg.GlobalConfig.DbType, str)
