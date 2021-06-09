@@ -26,6 +26,7 @@
     12. 图片验证码生成/验证  
     13. websocket长连接处理(含token)
     14. 公共常用请求参数验证，contxtverify.go
+    15. 敏感词过滤
 
 
 #### TIPS     
