@@ -61,7 +61,6 @@ func SendMsg(moblie, Code string, need sett.AlimsgNeed) (code int) {
 	request.Scheme = need.MsgScheme
 	request.PhoneNumbers = moblie
 	request.SignName = need.MsgSignName
-	// request.SignName = "海南生活"
 	request.TemplateCode = need.MsgTemplate
 	request.TemplateParam = fmt.Sprintf("{code:%s}", Code)
 	response, err := client.SendSms(request)
