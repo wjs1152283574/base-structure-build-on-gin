@@ -219,3 +219,59 @@ func GetList(key string) (res []string, err error) {
 	}
 	return reply, nil
 }
+
+// Dellist 删除集合中某一项
+func Dellist(key, target string) error {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	_, err := conn.Do("SREM", key, target)
+	return err
+}
+
+// PipeLineSet pipeline : {key:value,key2:value2}
+func PipeLineSet(data map[string]interface{}) error {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	for k, v := range data {
+		if err := conn.Send("set", k, v); err != nil {
+			return err
+		}
+	}
+	return conn.Flush()
+}
+
+// Mset mset : 两个切片键值顺序一一对应
+func Mset(keys []string, vals []interface{}) (err error) {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	var input []interface{}
+	for i := 0; i < len(keys); i++ {
+		input = append(input, keys[i], vals[i])
+	}
+	_, err = conn.Do("mset", input...)
+	return
+}
+
+// Mget mget : 同时获取 icon/nick_name
+func Mget(keys []interface{}, icon, NickName *string) (err error) {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	reply, err := redis.Values(conn.Do("mget", keys...))
+	if err != nil {
+		return
+	}
+	if _, err = redis.Scan(reply, &icon, &NickName); err != nil {
+		return
+	}
+	return nil
+}
+
+// Hash set hash
+func Hash(file, col string, val interface{}) error {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	if _, err := conn.Do("hset", file, col, val); err != nil {
+		return err
+	}
+	return nil
+}
