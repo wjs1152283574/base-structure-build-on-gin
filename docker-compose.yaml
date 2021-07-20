@@ -2,34 +2,46 @@ version: '3'
 services:
   web:
     build: .
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
     ports: 
       - "9000:9000"
     depends_on: 
       - redis
       - db
       - fastdfs
+      - nginx_casso
   fastdfs:
     container_name: fastdfs
     image: sjqzhang/go-fastdfs
     environment:
       - GO_FASTDFS_DIR=/data
+      - TZ=Asia/Shanghai
     restart: always
     ports:
-      - 80:8080
+      - 8080:8080
     volumes:
       - ./data:/data
   redis:
     container_name: redis
     image: redis
     restart: always
+    environment:
+      TZ: Asia/Shanghai
     ports: 
-      - 6380:6379
+      - 6379:6379
+    volumes:
+      - ./redis_data:/data/
+      - ./redis_logs:/var/log/redis/
+      - ./redis.cnof:/data/redis/
+    command: redis-server /data/redis/redis.conf  
   db:
-    # restart: always
+    restart: always
     image: mysql:5.7.22
     container_name: mysql_5.7
     ports:
-      - 3307:3306
+      - 3306:3306
     environment:
       TZ: Asia/Shanghai
       MYSQL_ROOT_PASSWORD: "password"   # defaultUser : root
@@ -40,7 +52,21 @@ services:
       --explicit_defaults_for_timestamp=true
       --lower_case_table_names=1
       --max_allowed_packet=128M
+      --skip-name-resolve
       --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO"
     volumes:
       - ./docker-db:/var/lib/mysql
       # - "./init:/docker-entrypoint-initdb.d/"
+  nginx_casso:
+    container_name: nginx_star_chats
+    image: nginx
+    restart: always
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - 80:80
+    privileged: false
+    volumes:
+      - ./conf/:/etc/nginx/
+      - ./html/:/usr/share/nginx/html/
+      - ./logs/:/var/log/nginx/

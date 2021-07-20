@@ -2,6 +2,7 @@
 
 #### 介绍
 * 涉及:`golang` `gin` `gorm` `mysql` `redis` `viper` `websocket` `crons` `base64Captcha` `fastdfs` `docker-compose` `ratelimit` 
+* `docker-compose up` 运行，包含`mysql redis fastdfs nginx`镜像
 
 #### 架构
 * `config`:配置文件存放
