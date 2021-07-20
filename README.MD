@@ -1,9 +1,7 @@
 # go-cli
 
 #### 介绍
-* 涉及:`golang` `gin` `gorm` `mysql` `redis` `viper` `websocket` `crons` `base64Captcha` `fastdfs` `docker-compose` 暂时这么多,慢慢添加
-* 不管是直接编译运行还是使用`docker`,记得先看清楚配置文件修改了没有哦
-* 这个根据个人经验整合的一个最基础的项目结构. 
+* 涉及:`golang` `gin` `gorm` `mysql` `redis` `viper` `websocket` `crons` `base64Captcha` `fastdfs` `docker-compose` `ratelimit` 
 
 #### 架构
 * `config`:配置文件存放
@@ -11,7 +9,7 @@
 * `db`:结构体模型
 * `routers`:路由
 * `service`:业务逻辑
-* `utils`:工具类(跨域/JWT/配置文件解析/MD5/验证器/websocket)
+* `utils`:工具类包含如下
     1. 阿里云短信/验证码生成
     2. 跨域中间件 
     3. JWTtoken生成/解析/验证/刷新
@@ -27,6 +25,7 @@
     13. websocket长连接处理(含token)
     14. 公共常用请求参数验证，contxtverify.go
     15. 敏感词过滤
+    16. `ratelimit`过载保护中间件
 
 
 #### TIPS     

@@ -20,6 +20,7 @@ func init() {
 	set["你妈"] = nil
 	set["狗日"] = nil
 	set["Fuck"] = nil
+	// init data from your db
 	addSensitiveToMap(set)
 }
 
@@ -98,7 +99,7 @@ func changeSensitiveWords(txt string, sensitive map[string]interface{}) (word st
 	return string(str)
 }
 
-// GetSencitiveResponse 对外唯一暴露APi
+// GetSencitiveResponse can only call this fun to verify your string
 func GetSencitiveResponse(str string) string {
 	return changeSensitiveWords(str, sensitiveWord)
 }

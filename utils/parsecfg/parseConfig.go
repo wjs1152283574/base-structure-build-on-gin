@@ -31,6 +31,7 @@ type EnvCfg struct {
 	Mysql            MysqlCfg
 	Redis            RedisCfg
 	Timer            TimerCfg
+	RateLimit        int
 }
 
 // MysqlCfg mysql配置

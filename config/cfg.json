@@ -8,6 +8,7 @@
     "SuperUser3":"17620439809",
     "Pass":"*****",
     "Env":"test",  
+    "RateLimit":100,
     "Mysql":{
         
         "Write":{
