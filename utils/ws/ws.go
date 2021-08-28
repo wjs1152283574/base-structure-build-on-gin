@@ -90,9 +90,7 @@ func (c *Client) Read() {
 	defer func() {
 		WebsocketManager.UnRegister <- c
 		log.Printf("Read:client [%s] disconnect", c.ID)
-		if err := c.Socket.Close(); err != nil {
-			// log.Printf("client [%s] 服务端断开连接出错 READ: %s", c.ID, err)
-		}
+		c.Socket.Close()
 	}()
 	for {
 		messageType, message, err := c.Socket.ReadMessage() // 从客户端那边发送过来的数据再写入Message通道(后台消息分发是程序直接往Message通道里面直接写入数据)
@@ -104,13 +102,7 @@ func (c *Client) Read() {
 			}
 			return
 		}
-		if len(WebsocketManager.Group) > 0 {
-			var s []string
-			for k, _ := range WebsocketManager.Group {
-				s = append(s, k)
-			}
-			log.Printf("在线人数:%d---存活链接:%d--%#v", WebsocketManager.groupCount, WebsocketManager.groupCount, s)
-		}
+		log.Printf("在线人数:%d---存活链接:%d", WebsocketManager.groupCount, WebsocketManager.groupCount)
 		log.Printf("client [%s] receive message: %s", c.ID, string(message))
 		c.Message <- message // 写入channel,等待写入对应长连接通道
 	}
@@ -166,16 +158,16 @@ var Groups = make(map[string]GroupsDedials)
 func GetInfoByMobile(mobile []string, flag int) (res []map[string]string) {
 	item := make(map[string]string)
 	if flag == 1 { // from
-		nickName, _ := appredis.Get(mobile[0] + "nick_name")
-		icon, _ := appredis.Get(mobile[0] + "icon")
-		item["nick_name"] = string(nickName)
-		item["icon"] = string(icon)
+		var icon, nickName string
+		appredis.Mget([]interface{}{mobile[0] + ":icon", mobile[0] + ":nick_name"}, &icon, &nickName)
+		item["nick_name"] = nickName
+		item["icon"] = icon
 		item["mobile"] = mobile[0]
 		res = append(res, item)
 	} else { // to
 		for _, v := range mobile {
-			nickName, _ := appredis.Get(v + "nick_name")
-			icon, _ := appredis.Get(v + "icon")
+			var icon, nickName string
+			appredis.Mget([]interface{}{v + ":icon", v + ":nick_name"}, &icon, &nickName)
 			item["nick_name"] = string(nickName)
 			item["icon"] = string(icon)
 			item["mobile"] = v

@@ -8,7 +8,9 @@ package appredis
 
 import (
 	"encoding/json"
+	"fmt"
 	"goweb/utils/parsecfg"
+	"log"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -21,20 +23,26 @@ var RedisDefaultPool *redis.Pool
 
 func init() {
 	if parsecfg.GlobalConfig.Env == "dev" {
-		RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.Host, parsecfg.GlobalConfig.Redis.Port, parsecfg.GlobalConfig.Redis.Auth, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive)
+		RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.Host, parsecfg.GlobalConfig.Redis.Port, parsecfg.GlobalConfig.Redis.Auth, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive, 12)
 	}
-	if parsecfg.GlobalConfig.Env == "test" {
-		RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.HostLive, parsecfg.GlobalConfig.Redis.PortLive, parsecfg.GlobalConfig.Redis.Auth, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive)
+	if parsecfg.GlobalConfig.Env == "prod" {
+		RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.HostLive, parsecfg.GlobalConfig.Redis.PortLive, parsecfg.GlobalConfig.Redis.Auth, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive, 12)
 	}
+	// if parsecfg.GlobalConfig.Env == "stage" {
+	// 	RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.HostStage, parsecfg.GlobalConfig.Redis.PortStage, parsecfg.GlobalConfig.Redis.Auth, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive, parsecfg.GlobalConfig.Redis.IdleTimeout)
+	// }
+	// RedisDefaultPool = NewPool("182.92.186.214", "6379", "wjs123456.", 23, 100, 300) // this is my docker redis-container for local redis_testing
+	log.Println("redis init finished...")
 }
 
 // NewPool 项目运行初始化redis连接池
-func NewPool(addr, port, auth string, max, maxactive int) *redis.Pool { // 传入 ip:port 最大闲置连接数 最大活跃连接数
+func NewPool(addr, port, auth string, max, maxactive, IdleTimeout int) *redis.Pool { // 传入 ip:port 最大闲置连接数 最大活跃连接数
 	str := addr + ":" + port
 	return &redis.Pool{
 		MaxIdle:     max,
 		MaxActive:   maxactive,
-		IdleTimeout: 240 * time.Second,
+		IdleTimeout: time.Duration(IdleTimeout) * time.Second,
+		Wait:        true, // 开启超时等待(获取连接等待)
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", str)
 			if err != nil {
@@ -76,7 +84,7 @@ func SetJSON(key string, data interface{}, time int) error {
 	return nil
 }
 
-// SetExpire 是这基础类型+ TTL
+// SetExpire 是这基础类型+ TTL(time to line 过期时间)
 func SetExpire(key string, data interface{}, time int) error {
 	conn := RedisDefaultPool.Get()
 	defer conn.Close()
@@ -150,6 +158,13 @@ func Delete(key string) (bool, error) {
 	return redis.Bool(conn.Do("DEL", key))
 }
 
+// MultiDelete 删除keys
+func MultiDelete(key []interface{}) (bool, error) {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	return redis.Bool(conn.Do("DEL", key...))
+}
+
 // GetLIke 获取相似Key
 func GetLIke(key string) (res [][]byte, err error) {
 	conn := RedisDefaultPool.Get()
@@ -164,6 +179,18 @@ func GetLIke(key string) (res [][]byte, err error) {
 		r = append(r, val)
 	}
 	return r, nil
+}
+
+// GetLIkeTo 获取相似Key:to
+func GetLIkeTo(key string) (res []string, err error) {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	res, err = redis.Strings(conn.Do("KEYS", key))
+	if err != nil {
+		fmt.Println(err, "getlike")
+		return []string{}, err
+	}
+	return
 }
 
 // LikeDeletes 删除相似key
@@ -233,6 +260,7 @@ func PipeLineSet(data map[string]interface{}) error {
 	conn := RedisDefaultPool.Get()
 	defer conn.Close()
 	for k, v := range data {
+		fmt.Println(k, v)
 		if err := conn.Send("set", k, v); err != nil {
 			return err
 		}
@@ -274,4 +302,62 @@ func Hash(file, col string, val interface{}) error {
 		return err
 	}
 	return nil
+}
+
+// HashExit
+func HashExit(file, col string) (flag bool, err error) {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	flag, err = redis.Bool(conn.Do("HEXISTS", file, col))
+	return
+}
+
+// Lpush 头部添加
+func Lpush(key string, data []byte) error {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	_, err := conn.Do("LPUSH", key, data)
+	return err
+}
+
+// PipeLineHset pipeline hset for groupDetails
+func PipeLineHset(file string, data map[string]interface{}) error {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	for k, v := range data {
+		fmt.Println(k, v)
+		if err := conn.Send("hset", file, k, v); err != nil {
+			return err
+		}
+	}
+	return conn.Flush()
+}
+
+// Sadd set with mutible value, vals[0] would be the key
+func Sadd(vals ...string) error {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	var s = []interface{}{}
+	for _, v := range vals {
+		s = append(s, v)
+	}
+	_, err := conn.Do("sadd", s...)
+	return err
+}
+
+// Smembers get set members
+func Smembers(key string) (reply []string, err error) {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	reply, err = redis.Strings(conn.Do("Smembers", key))
+	fmt.Println(reply)
+	return
+}
+
+// Hget hash get
+func Hget(file, col string) (reply string, err error) {
+	conn := RedisDefaultPool.Get()
+	defer conn.Close()
+	reply, err = redis.String(conn.Do("hget", file, col))
+	return
 }
