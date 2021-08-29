@@ -201,7 +201,6 @@ func CheckInlineOutlingSend(mobiles []string, msg TranstMsg, flag bool) {
 		_ = storeMsgToRedis(message) // 消息存储
 	}
 	res, er := json.Marshal(TranslateMessage(msg, GetInfoByMobile([]string{msg.From}, 1)[0])) // 改变from 类型 并返回最新数据体格式
-	fmt.Print("发送前序列化出错:", er, "发送至列表:", mobiles, "\n")
 	for _, v := range mobiles {
 		if _, ok := WebsocketManager.Group[v]; ok { // 在线
 			msg.To = []string{}                                                              // 暂时先这样, 后期会去掉to 属性 , 因为人多的话很长
