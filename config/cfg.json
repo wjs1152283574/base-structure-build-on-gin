@@ -55,5 +55,11 @@
     },
     "Timer":{
         "Store":"* * * * * *"  
+    },
+    "Kafka":{
+        "Host":"127.0.0.1",
+        "Port":":9092",
+        "Auth":"wjs123456.",
+        "Topic":"transer"
     }
 }

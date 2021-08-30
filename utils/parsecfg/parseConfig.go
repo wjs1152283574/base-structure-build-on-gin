@@ -27,11 +27,13 @@ type EnvCfg struct {
 	SuperUser3       string
 	Pass             string
 	AllowCrossDomain bool
-	Env              string // "dev":127.0.0.1:9000 "pro":    "test":112.74.179.19
+	Env              string
 	Mysql            MysqlCfg
 	Redis            RedisCfg
 	Timer            TimerCfg
 	RateLimit        int
+	Kafka            Kafka
+	OpenApi          Open
 }
 
 // MysqlCfg mysql配置
@@ -47,6 +49,8 @@ type MysqlWriteCfg struct {
 	DataBase        string
 	Port            string
 	PortLive        string
+	HostStage       string
+	PortStage       string
 	PreFix          string
 	User            string
 	PassWord        string
@@ -70,18 +74,35 @@ type MysqlReadCfg struct {
 
 // RedisCfg redis配置
 type RedisCfg struct {
-	Host      string
-	HostLive  string
-	Port      string
-	PortLive  string
-	Auth      string
-	MaxIdle   int
-	MaxActive int
+	Host        string
+	HostLive    string
+	Port        string
+	PortLive    string
+	Auth        string
+	HostStage   string
+	PortStage   string
+	MaxIdle     int
+	MaxActive   int
+	IdleTimeout int
 }
 
 // TimerCfg 定时器配置
 type TimerCfg struct {
 	Store string
+}
+
+// Kafka
+type Kafka struct {
+	Host  string
+	Port  string
+	Auth  string
+	Topic string
+}
+
+// Open
+type Open struct {
+	Key    string
+	Domian string
 }
 
 func init() {
