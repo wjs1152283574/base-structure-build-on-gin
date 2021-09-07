@@ -1,8 +1,10 @@
-package userlogi
+package user
 
 import (
 	"fmt"
-	"goweb/db/appuser"
+	dto "goweb/model/dto/user"
+	entity "goweb/model/entity/user"
+	vo "goweb/model/vo/user"
 	"goweb/utils/contxtverify"
 	"goweb/utils/customerjwt"
 	"goweb/utils/passmd5"
@@ -15,21 +17,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SignUpReq 新建用户请求数据
-type SignUpReq struct {
-	Name   string `json:"username" binding:"required"`
-	Pwd    string `json:"password" binding:"required"`
-	Mobile string `json:"mobile" binding:"required"`
-}
-
 // SignUp  新建用户
 func SignUp(c *gin.Context) {
-	var postData SignUpReq
+	var postData entity.SignUpReq
 	if err := c.ShouldBind(&postData); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, nil)
 		return
 	}
-	var me appuser.User
+	var me dto.User
 	me.Mobile = postData.Mobile
 	if err := me.Check(); err == nil { // 通过 `First` API  查找, 不存在侧会报错
 		response.ReturnJSON(c, http.StatusOK, statuscode.AlreadyExit.Code, statuscode.AlreadyExit.Msg, nil)
@@ -37,7 +32,7 @@ func SignUp(c *gin.Context) {
 	}
 	me.Name = postData.Name
 	me.Pwd = passmd5.Base64Md5(postData.Mobile)
-	var res appuser.ResUser
+	var res vo.ResUser
 	if err := me.Create(&res); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
@@ -60,8 +55,8 @@ func GetUser(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, err)
 		return
 	}
-	var me appuser.User
-	var res appuser.ResUser
+	var me dto.User
+	var res vo.ResUser
 	me.ID = uint(id)
 	if err := me.Get(&res); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
@@ -78,7 +73,7 @@ type SignInReq struct {
 
 // SignIn 用户登陆 签发token
 func SignIn(c *gin.Context) {
-	var postData SignUpReq
+	var postData entity.SignUpReq
 	if err := c.ShouldBind(&postData); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
@@ -101,9 +96,10 @@ func UserList(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, err)
 		return
 	}
-	var u appuser.User
-	var res []appuser.User
-	if err := contxtverify.CheckAdmin(c, &u); err != nil {
+	var u dto.User
+	var res []vo.AdminUserList
+	mobile := c.GetString("mobile")
+	if err := contxtverify.CheckAdmin(mobile); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.PermitionDenid.Code, statuscode.PermitionDenid.Msg, err)
 		return
 	}

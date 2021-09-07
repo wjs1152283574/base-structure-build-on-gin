@@ -4,7 +4,7 @@
  * @Last Modified by:   Casso-Wong
  * @Last Modified time: 2021-06-04 14:41:27
  */
-package appmysql
+package mysql
 
 // MYSQL 数据库初始化
 

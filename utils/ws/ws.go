@@ -10,7 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"goweb/dao/appredis"
+	appredis "goweb/dao/redis"
 	"goweb/utils/alimsg"
 	"goweb/utils/customerjwt"
 	"goweb/utils/parsecfg"

@@ -8,7 +8,7 @@ package sett
 
 import (
 	"fmt"
-	"goweb/dao/appmysql"
+	"goweb/dao/mysql"
 
 	"github.com/jinzhu/gorm"
 )
@@ -16,7 +16,7 @@ import (
 // 配置
 
 func init() {
-	appmysql.DB.AutoMigrate(
+	mysql.DB.AutoMigrate(
 		&Sett{},
 		&ConBanner{},
 		&ConTag{},
@@ -87,17 +87,17 @@ type AlimsgNeed struct {
 
 // GetForAli  获取对应APP的短信配置
 func (s *Sett) GetForAli(res *AlimsgNeed) error {
-	return appmysql.DB.Table("setts").Select("msg_location,msg_key,msg_scret_key,msg_scheme,msg_sign_name,msg_template").Where("app_code =?", s.AppCode).First(res).Error
+	return mysql.DB.Table("setts").Select("msg_location,msg_key,msg_scret_key,msg_scheme,msg_sign_name,msg_template").Where("app_code =?", s.AppCode).First(res).Error
 }
 
 // Create  生成新的配置
 func (s *Sett) Create() error {
-	return appmysql.DB.Model(s).Create(s).First(s).Error
+	return mysql.DB.Model(s).Create(s).First(s).Error
 }
 
 // Upd  更新总配置
 func (s *Sett) Upd() error {
-	return appmysql.DB.Model(s).Updates(s).Where("id = ?", s.ID).Error
+	return mysql.DB.Model(s).Updates(s).Where("id = ?", s.ID).Error
 }
 
 // ConBanner 联系人banner
@@ -111,17 +111,17 @@ type ConBanner struct {
 
 // Create  Create
 func (c *ConBanner) Create() error {
-	return appmysql.DB.Create(c).Error
+	return mysql.DB.Create(c).Error
 }
 
 // Del delete
 func (c *ConBanner) Del() error {
-	return appmysql.DB.Exec("delete from con_banners where id = ?", c.ID).Error
+	return mysql.DB.Exec("delete from con_banners where id = ?", c.ID).Error
 }
 
 // Upd  update
 func (c *ConBanner) Upd() error {
-	return appmysql.DB.Save(c).Error
+	return mysql.DB.Save(c).Error
 }
 
 // ConTag 联系人标签
@@ -136,17 +136,17 @@ type ConTag struct {
 
 // Create  Create
 func (c *ConTag) Create() error {
-	return appmysql.DB.Create(c).Error
+	return mysql.DB.Create(c).Error
 }
 
 // Del delete
 func (c *ConTag) Del() error {
-	return appmysql.DB.Exec("delete from con_tags where id = ?", c.ID).Error
+	return mysql.DB.Exec("delete from con_tags where id = ?", c.ID).Error
 }
 
 // Upd  update
 func (c *ConTag) Upd() error {
-	return appmysql.DB.Save(c).Error
+	return mysql.DB.Save(c).Error
 }
 
 // MyApp 我的应用
@@ -161,17 +161,17 @@ type MyApp struct {
 
 // Create  Create
 func (m *MyApp) Create() error {
-	return appmysql.DB.Create(m).Error
+	return mysql.DB.Create(m).Error
 }
 
 // Del delete
 func (m *MyApp) Del() error {
-	return appmysql.DB.Exec("delete from my_apps where id = ?", m.ID).Error
+	return mysql.DB.Exec("delete from my_apps where id = ?", m.ID).Error
 }
 
 // Upd  update
 func (c *MyApp) Upd() error {
-	return appmysql.DB.Save(c).Error
+	return mysql.DB.Save(c).Error
 }
 
 // Bag 钱包
@@ -186,17 +186,17 @@ type Bag struct {
 
 // Create  Create
 func (b *Bag) Create() error {
-	return appmysql.DB.Create(b).Error
+	return mysql.DB.Create(b).Error
 }
 
 // Del delete
 func (b *Bag) Del() error {
-	return appmysql.DB.Exec("delete from bags where id = ?", b.ID).Error
+	return mysql.DB.Exec("delete from bags where id = ?", b.ID).Error
 }
 
 // Upd  update
 func (c *Bag) Upd() error {
-	return appmysql.DB.Save(c).Error
+	return mysql.DB.Save(c).Error
 }
 
 // NavFun 左侧菜单功能
@@ -212,17 +212,17 @@ type NavFun struct {
 
 // Create  Create
 func (n *NavFun) Create() error {
-	return appmysql.DB.Create(n).Error
+	return mysql.DB.Create(n).Error
 }
 
 // Del delete
 func (n *NavFun) Del() error {
-	return appmysql.DB.Exec("delete from nav_funs where id = ?", n.ID).Error
+	return mysql.DB.Exec("delete from nav_funs where id = ?", n.ID).Error
 }
 
 // Upd  update
 func (n *NavFun) Upd() error {
-	return appmysql.DB.Model(n).Save(n).Error
+	return mysql.DB.Model(n).Save(n).Error
 }
 
 // SetRes 总设置返回结构
@@ -309,17 +309,17 @@ func (s *Sett) Get(res *SetRes) error {
 	var myapp []MyAppRes
 	var bag []BagRes
 	var navfun []NavFunRes
-	appmysql.DB.Table("con_banners").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(6).Scan(&conbanner)
-	appmysql.DB.Table("con_tags").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(6).Scan(&contag)
-	appmysql.DB.Table("my_apps").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(6).Scan(&myapp)
-	appmysql.DB.Table("bags").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(6).Scan(&bag)
-	appmysql.DB.Table("nav_funs").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(16).Scan(&navfun)
+	mysql.DB.Table("con_banners").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(6).Scan(&conbanner)
+	mysql.DB.Table("con_tags").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(6).Scan(&contag)
+	mysql.DB.Table("my_apps").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(6).Scan(&myapp)
+	mysql.DB.Table("bags").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(6).Scan(&bag)
+	mysql.DB.Table("nav_funs").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Limit(16).Scan(&navfun)
 	res.ConBannerRes = conbanner
 	res.ConTagRes = contag
 	res.MyAppRes = myapp
 	res.BagRes = bag
 	res.NavFunRes = navfun
-	return appmysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).First(res).Error
+	return mysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).First(res).Error
 }
 
 // SetResAdmin 总设置返回结构
@@ -374,7 +374,7 @@ type SetResAdmin struct {
 // Check xxx
 func (s *Sett) Check() error {
 	fmt.Println(s.AppCode, 8989)
-	return appmysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).Scan(s).Error
+	return mysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).Scan(s).Error
 }
 
 // GetAdmin 获取总设置
@@ -384,17 +384,17 @@ func (s *Sett) GetAdmin(res *SetResAdmin) error {
 	var myapp []MyApp
 	var bag []Bag
 	var navfun []NavFun
-	appmysql.DB.Table("con_banners").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&banner)
-	appmysql.DB.Table("con_tags").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&tag)
-	appmysql.DB.Table("my_apps").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&myapp)
-	appmysql.DB.Table("bags").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&bag)
-	appmysql.DB.Table("nav_funs").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&navfun)
+	mysql.DB.Table("con_banners").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&banner)
+	mysql.DB.Table("con_tags").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&tag)
+	mysql.DB.Table("my_apps").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&myapp)
+	mysql.DB.Table("bags").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&bag)
+	mysql.DB.Table("nav_funs").Select("*").Where("s_id = ?", s.ID).Order("sort DESC").Scan(&navfun)
 	res.ConBannerRes = banner
 	res.ConTagRes = tag
 	res.MyAppRes = myapp
 	res.BagRes = bag
 	res.NavFunRes = navfun
-	return appmysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).First(res).Error
+	return mysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).First(res).Error
 }
 
 // Codes xx
@@ -406,5 +406,5 @@ type Codes struct {
 
 // GetAdmin 获取总设置
 func (s *Sett) GetCode(res *[]Codes) error {
-	return appmysql.DB.Table("setts").Select("id,app_code,app_name").Scan(res).Error
+	return mysql.DB.Table("setts").Select("id,app_code,app_name").Scan(res).Error
 }

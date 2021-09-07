@@ -7,7 +7,7 @@ ENV GO111MODULE=on \
     
 WORKDIR /app
 
-COPY . .
+COPY ../ .
 
 RUN go build .
 

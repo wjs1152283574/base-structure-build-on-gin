@@ -9,7 +9,7 @@ package alimsg
 import (
 	"crypto/rand"
 	"fmt"
-	"goweb/db/sett"
+	"goweb/model/dto/sett"
 	"io"
 
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"

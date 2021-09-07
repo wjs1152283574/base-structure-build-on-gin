@@ -8,7 +8,7 @@ package contxtverify
 
 import (
 	"errors"
-	"goweb/db/appuser"
+	dto "goweb/model/dto/user"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -27,9 +27,9 @@ func CheckPageLimit(c *gin.Context) (page, limit int, err error) {
 }
 
 // CheckAdmin is or not; can be use for admin user checkking
-func CheckAdmin(c *gin.Context, u *appuser.User) error {
-	meMobile := c.GetString("mobile")
-	u.Mobile = meMobile
+func CheckAdmin(mobile string) error {
+	var u dto.User
+	u.Mobile = mobile
 	if err := u.Check(); err != nil {
 		return err
 	}
@@ -42,9 +42,9 @@ func CheckAdmin(c *gin.Context, u *appuser.User) error {
 	return nil
 }
 
-func CheckFront(c *gin.Context, u *appuser.User) error {
-	meMobile := c.GetString("mobile")
-	u.Mobile = meMobile
+func CheckFront(mobile string) error {
+	var u dto.User
+	u.Mobile = mobile
 	if err := u.Check(); err != nil {
 		return err
 	}

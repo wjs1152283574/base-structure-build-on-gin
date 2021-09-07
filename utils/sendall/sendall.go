@@ -7,7 +7,8 @@
 package sendall
 
 import (
-	"goweb/db/appuser"
+	dto "goweb/model/dto/user"
+	vo "goweb/model/vo/user"
 	"goweb/utils/ws"
 )
 
@@ -15,8 +16,8 @@ import (
 
 // NotifyAll 通知所有移动端用户更新配置
 func NotifyAll(code int, codemsg string) {
-	var u appuser.User
-	var res []appuser.GetSendAll
+	var u dto.User
+	var res []vo.GetSendAll
 	u.GetFrontU(&res)
 	var msg ws.TranstMsg
 	msg.MsgType = int64(code)

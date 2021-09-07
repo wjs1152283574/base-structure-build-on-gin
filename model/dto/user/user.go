@@ -1,14 +1,15 @@
-package appuser
+package user
 
 import (
-	"goweb/dao/appmysql"
+	"goweb/dao/mysql"
+	"goweb/model/vo/user"
 	"time"
 
 	"github.com/jinzhu/gorm"
 )
 
 func init() {
-	appmysql.DB.AutoMigrate(
+	mysql.DB.AutoMigrate(
 		&User{},
 		&Msg{},
 	)
@@ -45,48 +46,32 @@ func (u *User) BeforeCreate(scope *gorm.Scope) error {
 }
 
 // Create 创建用户
-func (u *User) Create(res *ResUser) error {
-	return appmysql.DB.Create(u).Scan(res).Error
+func (u *User) Create(res *user.ResUser) error {
+	return mysql.DB.Create(u).Scan(res).Error
 }
 
 // Create 新建消息
 func (m *Msg) Create() error {
-	return appmysql.DB.Create(m).Error
-}
-
-// ResUser query response
-type ResUser struct {
-	ID        int        `json:"usr_id"`
-	Age       int        `json:"age"`
-	Name      string     `json:"username"`
-	Gender    int        `json:"sex"`
-	Mobile    string     `json:"phone"`
-	Birthday  *time.Time `json:"birthday"`
-	CreatedAt time.Time  `json:"join_day"`
+	return mysql.DB.Create(m).Error
 }
 
 // Get 返回基础信息
-func (u *User) Get(res *ResUser) error {
-	return appmysql.DB.First(res).Error
+func (u *User) Get(res *user.ResUser) error {
+	return mysql.DB.First(res).Error
 }
 
 // Check 检测用户电话是否存在
 func (u *User) Check() error {
-	return appmysql.DB.Where("mobile = ?", u.Mobile).First(u).Error
+	return mysql.DB.Where("mobile = ?", u.Mobile).First(u).Error
 }
 
 // AdminGetList admin list
-func (u *User) AdminGetList(page, limit int, res *[]User) (count int, err error) {
-	appmysql.DB.Model(u).Count(&count)
-	return count, appmysql.DB.Model(u).Limit(limit).Offset((page - 1) * limit).Scan(res).Error
-}
-
-// GetSendAll send all
-type GetSendAll struct {
-	Mobile string `json:"mobile"`
+func (u *User) AdminGetList(page, limit int, res *[]user.AdminUserList) (count int, err error) {
+	mysql.DB.Model(u).Count(&count)
+	return count, mysql.DB.Model(u).Limit(limit).Offset((page - 1) * limit).Scan(res).Error
 }
 
 // GetFrontU get for send all
-func (u *User) GetFrontU(res *[]GetSendAll) error {
-	return appmysql.DB.Model(u).Where("deleted_at is null").Scan(res).Error
+func (u *User) GetFrontU(res *[]user.GetSendAll) error {
+	return mysql.DB.Model(u).Where("deleted_at is null").Scan(res).Error
 }
