@@ -1,14 +1,20 @@
 # go-cli
 
+#### 运行
+1. `cd ./deploy && docker-compose build && docker-compose up -d`
+2. 包含`mysql redis fastdfs nginx`镜像
+
 #### 介绍
 * 涉及:`golang` `gin` `gorm` `mysql` `redis` `viper` `websocket` `crons` `base64Captcha` `fastdfs` `docker-compose` `ratelimit` 
-* `docker-compose up` 运行，包含`mysql redis fastdfs nginx`镜像
+
 
 #### 架构
 * `config`:配置文件存放
-* `dao`:数据库连接   
-* `db`:结构体模型
-* `routers`:路由
+* `dao`:数据库连接  
+* `model/dto`:结构体模型及其方法
+* `model/entity`:请求参数模型
+* `model/vo`：视图模型，即接口返回模型
+* `routers`:路由及中间件
 * `service`:业务逻辑
 * `utils`:工具类包含如下
     1. 阿里云短信/验证码生成

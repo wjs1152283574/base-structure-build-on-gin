@@ -7,7 +7,7 @@
     "SuperUser2":"17620439808",
     "SuperUser3":"17620439809",
     "Pass":"*****",
-    "Env":"test",  
+    "Env":"dev",  
     "RateLimit":100,
     "Mysql":{
         
@@ -15,11 +15,11 @@
             "Host":"127.0.0.1",
             "HostLive":"*********",
             "DataBase":"goweb",
-            "Port":"3307",
+            "Port":"3306",
             "PortLive":"3306",
             "PreFix":"cs_",
             "User":"root",
-            "PassWord":"*******",                  
+            "PassWord":"password",                  
             "Charset":"utf8",
             "SetMaxIdleConns":10,
             "SetMaxOpenConns":128,
@@ -43,7 +43,7 @@
     "Redis":{
         "Host":"127.0.0.1",
         "HostLive":"*********",
-        "Port":"6380",
+        "Port":"6379",
         "PortLive":"6379",
         "Auth":".******",
         "MaxIdle":10,

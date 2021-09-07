@@ -17,6 +17,7 @@
 
 /html
 /static
+/docker
 /tem
 *.log
 /docker-db

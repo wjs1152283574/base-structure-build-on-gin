@@ -22,7 +22,7 @@ services:
     ports:
       - 8080:8080
     volumes:
-      - ./data:/data
+      - ./docker/fastdfs:/data
   redis:
     container_name: redis
     image: redis
@@ -32,9 +32,9 @@ services:
     ports: 
       - 6379:6379
     volumes:
-      - ./redis_data:/data/
-      - ./redis_logs:/var/log/redis/
-      - ./redis.cnof:/data/redis/
+      - ./docker/redis/redis_data:/data/
+      - ./docker/redis/redis_logs:/var/log/redis/
+      - ./docker/redis/redis.cnof:/data/redis/
     command: redis-server /data/redis/redis.conf  
   db:
     restart: always
@@ -55,7 +55,7 @@ services:
       --skip-name-resolve
       --sql-mode="STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO"
     volumes:
-      - ./docker-db:/var/lib/mysql
+      - ./docker/mysql:/var/lib/mysql
       # - "./init:/docker-entrypoint-initdb.d/"
   nginx_casso:
     container_name: nginx_star_chats
@@ -67,6 +67,6 @@ services:
       - 80:80
     privileged: false
     volumes:
-      - ./conf/:/etc/nginx/
-      - ./html/:/usr/share/nginx/html/
-      - ./logs/:/var/log/nginx/
+      - ./docker/nginx/conf/:/etc/nginx/
+      - ./docker/nginx/html/:/usr/share/nginx/html/
+      - ./docker/nginx/logs/:/var/log/nginx/
