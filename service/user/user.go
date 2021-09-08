@@ -1,10 +1,8 @@
 package user
 
 import (
-	"fmt"
 	dto "goweb/model/dto/user"
 	entity "goweb/model/entity/user"
-	vo "goweb/model/vo/user"
 	"goweb/utils/contxtverify"
 	"goweb/utils/customerjwt"
 	"goweb/utils/passmd5"
@@ -26,23 +24,24 @@ func SignUp(c *gin.Context) {
 	}
 	var me dto.User
 	me.Mobile = postData.Mobile
-	if err := me.Check(); err == nil { // 通过 `First` API  查找, 不存在侧会报错
+	if err := me.Check(); err == nil { // 通过 `First` API  查找, 数据不存在会报错
 		response.ReturnJSON(c, http.StatusOK, statuscode.AlreadyExit.Code, statuscode.AlreadyExit.Msg, nil)
 		return
 	}
 	me.Name = postData.Name
 	me.Pwd = passmd5.Base64Md5(postData.Mobile)
-	var res vo.ResUser
-	if err := me.Create(&res); err != nil {
+	res, err := me.Create()
+	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
 	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: res.Name, Password: postData.Pwd}
 	token, err := customerjwt.NewJWT().CreateToken(payLoad)
 	if err != nil {
-		fmt.Println("生成Token失败,可调用登录接口")
+		response.ReturnJSON(c, http.StatusOK, statuscode.FailToken.Code, statuscode.FailToken.Msg, err)
+		return
 	}
-	response.ReturnJSON(c, http.StatusOK, statuscode.Suucess.Code, statuscode.Suucess.Msg, map[string]interface{}{
+	response.ReturnJSON(c, http.StatusOK, statuscode.Success.Code, statuscode.Success.Msg, map[string]interface{}{
 		"infos": res,
 		"token": token,
 	})
@@ -56,13 +55,13 @@ func GetUser(c *gin.Context) {
 		return
 	}
 	var me dto.User
-	var res vo.ResUser
 	me.ID = uint(id)
-	if err := me.Get(&res); err != nil {
+	res, err := me.Get()
+	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
-	response.ReturnJSON(c, http.StatusOK, statuscode.Suucess.Code, statuscode.Suucess.Msg, res)
+	response.ReturnJSON(c, http.StatusOK, statuscode.Success.Code, statuscode.Success.Msg, res)
 }
 
 // SignInReq 登录请求结构
@@ -96,14 +95,14 @@ func UserList(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, err)
 		return
 	}
-	var u dto.User
-	var res []vo.AdminUserList
+
 	mobile := c.GetString("mobile")
 	if err := contxtverify.CheckAdmin(mobile); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.PermitionDenid.Code, statuscode.PermitionDenid.Msg, err)
 		return
 	}
-	count, err := u.AdminGetList(page, limit, &res)
+	var u dto.User
+	res, count, err := u.AdminGetList(page, limit)
 	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return

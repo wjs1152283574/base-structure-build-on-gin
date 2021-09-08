@@ -13,8 +13,8 @@ type comment struct {
 	Msg  string
 }
 
-// Suucess 操作成功
-var Suucess = comment{
+// Success 操作成功
+var Success = comment{
 	Code: 20000,
 	Msg:  "操作成功!",
 }

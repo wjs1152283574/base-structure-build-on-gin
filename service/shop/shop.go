@@ -1,1 +1,1 @@
-package shoplogi
+package shop

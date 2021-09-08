@@ -46,8 +46,8 @@ func (u *User) BeforeCreate(scope *gorm.Scope) error {
 }
 
 // Create 创建用户
-func (u *User) Create(res *user.ResUser) error {
-	return mysql.DB.Create(u).Scan(res).Error
+func (u *User) Create() (res *user.ResUser, err error) {
+	return res, mysql.DB.Create(u).Scan(res).Error
 }
 
 // Create 新建消息
@@ -56,8 +56,8 @@ func (m *Msg) Create() error {
 }
 
 // Get 返回基础信息
-func (u *User) Get(res *user.ResUser) error {
-	return mysql.DB.First(res).Error
+func (u *User) Get() (res *user.ResUser, err error) {
+	return res, mysql.DB.First(res).Error
 }
 
 // Check 检测用户电话是否存在
@@ -66,9 +66,9 @@ func (u *User) Check() error {
 }
 
 // AdminGetList admin list
-func (u *User) AdminGetList(page, limit int, res *[]user.AdminUserList) (count int, err error) {
+func (u *User) AdminGetList(page, limit int) (res *[]user.AdminUserList, count int, err error) {
 	mysql.DB.Model(u).Count(&count)
-	return count, mysql.DB.Model(u).Limit(limit).Offset((page - 1) * limit).Scan(res).Error
+	return res, count, mysql.DB.Model(u).Limit(limit).Offset((page - 1) * limit).Scan(res).Error
 }
 
 // GetFrontU get for send all
