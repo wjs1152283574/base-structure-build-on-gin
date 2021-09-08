@@ -24,7 +24,6 @@ func init() {
 		&Bag{},
 		&NavFun{},
 	)
-	// 直接生成
 }
 
 // Sett 总配置:显示/隐藏
@@ -217,17 +216,17 @@ func (n *NavFun) Upd() error {
 
 // Get 获取总设置
 func (s *Sett) Get(res *vo.SetRes) error {
-	return mysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).First(res).Error
+	return mysql.DB.Table("setts").Select("id,upd_link_ios,versions_ios,team").Where("app_code = ?", s.AppCode).First(res).Error
 }
 
 // Check
 func (s *Sett) Check() error {
-	return mysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).Scan(s).Error
+	return mysql.DB.Table("setts").Select("id,upd_link_ios,versions_ios,team").Where("app_code = ?", s.AppCode).Scan(s).Error
 }
 
 // GetAdmin 获取总设置
 func (s *Sett) GetAdmin(res *vo.SetResAdmin) error {
-	return mysql.DB.Table("setts").Select("*").Where("app_code = ?", s.AppCode).First(res).Error
+	return mysql.DB.Table("setts").Select("id,upd_link_ios,versions_ios,team").Where("app_code = ?", s.AppCode).First(res).Error
 }
 
 // GetAdmin 获取总设置
