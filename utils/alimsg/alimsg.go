@@ -9,7 +9,7 @@ package alimsg
 import (
 	"crypto/rand"
 	"fmt"
-	"goweb/model/dto/sett"
+	vo "goweb/model/vo/sett"
 	"io"
 
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
@@ -55,7 +55,7 @@ func OrderCode() (res string) {
 }
 
 // SendMsg 发送短信
-func SendMsg(moblie, Code string, need sett.AlimsgNeed) (code int) {
+func SendMsg(moblie, Code string, need vo.AlimsgNeed) (code int) {
 	client, err := dysmsapi.NewClientWithAccessKey(need.MsgLocation, need.MsgKey, need.MsgScretKey)
 	request := dysmsapi.CreateSendSmsRequest()
 	request.Scheme = need.MsgScheme
