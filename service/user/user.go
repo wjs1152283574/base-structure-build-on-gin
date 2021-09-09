@@ -65,20 +65,14 @@ func GetUser(c *gin.Context) {
 	response.ReturnJSON(c, http.StatusOK, statuscode.Success.Code, statuscode.Success.Msg, res)
 }
 
-// SignInReq 登录请求结构
-type SignInReq struct {
-	Name string `json:"name"`
-	Pass string `json:"pass"`
-}
-
 // SignIn 用户登陆 签发token
 func SignIn(c *gin.Context) {
-	var postData entity.SignUpReq
+	var postData entity.SignInReq
 	if err := c.ShouldBind(&postData); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
-	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: postData.Name, Password: postData.Pwd}
+	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: postData.Name, Password: postData.Pass}
 	token, err := customerjwt.NewJWT().CreateToken(payLoad)
 	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)

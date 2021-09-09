@@ -9,6 +9,12 @@ type SignUpReq struct {
 	Mobile string `json:"mobile" binding:"required"`
 }
 
+// SignInReq 登录请求结构
+type SignInReq struct {
+	Name string `json:"name"`
+	Pass string `json:"pass"`
+}
+
 // UserUpdReq 编辑用户请求数据
 type UserUpdReq struct {
 	Birthday *time.Time `json:"birthday"`

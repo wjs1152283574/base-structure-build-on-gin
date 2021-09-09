@@ -38,10 +38,11 @@ func InitAPIRouter() *gin.Engine {
 	// 前端
 	app := router.Group("/app")
 	{
-		v12 := app.Group("/auth")
-		v12.Use(customerjwt.JWTAuth())
+		appAuth := app.Group("/auth")
+		appAuth.Use(customerjwt.JWTAuth())
 		{
-			v12.GET("/user/:id", user.GetUser) // 查看用户信息
+			appAuth.GET("/user/:id", user.GetUser) // 查看用户信息
+			appAuth.PUT("/user", user.UserUpd)     // 用户编辑
 		}
 		app.POST("/user", user.SignUp)  // 用户注册
 		app.POST("/login", user.SignIn) // 用户登录
