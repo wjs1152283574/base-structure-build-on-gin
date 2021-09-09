@@ -11,6 +11,7 @@ import (
 	"fmt"
 	vo "goweb/model/vo/sett"
 	"io"
+	"log"
 
 	"github.com/aliyun/alibaba-cloud-sdk-go/services/dysmsapi"
 )
@@ -65,8 +66,7 @@ func SendMsg(moblie, Code string, need vo.AlimsgNeed) (code int) {
 	request.TemplateParam = fmt.Sprintf("{code:%s}", Code)
 	response, err := client.SendSms(request)
 	if err != nil {
-		fmt.Print(err.Error())
+		log.Fatal(err)
 	}
-	fmt.Printf("ali sendmsg response code is %#v\n", response.BaseResponse.GetHttpStatus())
 	return response.BaseResponse.GetHttpStatus()
 }

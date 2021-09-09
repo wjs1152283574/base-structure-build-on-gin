@@ -9,7 +9,6 @@ package ws
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	appredis "goweb/dao/redis"
 	"goweb/utils/alimsg"
 	"goweb/utils/customerjwt"
@@ -470,7 +469,7 @@ func FilterGroupSingel(b []string, from, to string) (gid string, err error) {
 	for _, v := range b {
 		reply, errs := appredis.Smembers(v)
 		if errs != nil {
-			fmt.Println("查重时失败,", v)
+			log.Println("查重时失败,", v)
 		}
 		if len(reply) == 2 {
 			flag1, _ := tool.InSlice(from, reply)
@@ -479,7 +478,7 @@ func FilterGroupSingel(b []string, from, to string) (gid string, err error) {
 				return v, nil
 			}
 		} else {
-			fmt.Println("组员数量不对", reply)
+			log.Println("组员数量不对", reply)
 		}
 	}
 	return "", errors.New("没有查到已存在群组")
@@ -503,7 +502,6 @@ func StoreCurrenGroups(gn string, g GroupsDedials) error {
 	var final = []string{gn + ":to"}
 	final = append(final, g.To...)
 	err := appredis.Sadd(final...) // 组员使用集合存储（去重）
-	fmt.Println(err, "SADD")
 	return err
 }
 
@@ -580,7 +578,7 @@ func (manager *Manager) WsClient(ctx *gin.Context) {
 	var jwt = customerjwt.NewJWT()
 	tokenInfo, tokenErr := jwt.ParseToken([]string{ctx.GetHeader("Sec-WebSocket-Protocol")}[0])
 	if tokenErr != nil || []string{ctx.GetHeader("Sec-WebSocket-Protocol")}[0] == "" { // 如果错误不为空或者拿到的token是空字符串
-		fmt.Println("token 不合法，长连接失败返回！本次token:", []string{ctx.GetHeader("Sec-WebSocket-Protocol")}[0])
+		log.Println("token 不合法，长连接失败返回！本次token:", []string{ctx.GetHeader("Sec-WebSocket-Protocol")}[0])
 	} else {
 		upGrader := websocket.Upgrader{
 			// cross origin domain
@@ -613,7 +611,7 @@ func (manager *Manager) WsClient(ctx *gin.Context) {
 func HistoryMsgs(ClientID string) {
 	history, redisErr := appredis.GetList(ClientID + ":history")
 	if redisErr != nil {
-		fmt.Println("历史消息获取出错!!!!") // 尝试panic ，输入日志（日志是顶层统一处理）
+		log.Println("历史消息获取出错!!!!") // 尝试panic ，输入日志（日志是顶层统一处理）
 		return
 	}
 	var msglist []TranstMsg
@@ -625,7 +623,6 @@ func HistoryMsgs(ClientID string) {
 		}
 	}
 	if len(msglist) == 0 {
-		fmt.Println("无历史消息!!!!")
 		return
 	}
 	// 剔除系统配置更改消息：只返回一条即可 meg_type:240

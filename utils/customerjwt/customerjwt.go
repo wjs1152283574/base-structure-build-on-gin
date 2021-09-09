@@ -2,7 +2,6 @@ package customerjwt
 
 import (
 	"errors"
-	"fmt"
 	"goweb/utils/response"
 	"goweb/utils/statuscode"
 	"log"
@@ -29,7 +28,6 @@ func JWTAuth() gin.HandlerFunc {
 				token = strings.Split(tokenStr, " ")[1]
 			}
 		}
-		fmt.Println(token)
 		if token == "" {
 			response.ReturnJSON(c, http.StatusOK, statuscode.FailToken.Code, statuscode.FailToken.Msg, nil)
 			c.Abort()
@@ -44,7 +42,6 @@ func JWTAuth() gin.HandlerFunc {
 		if err != nil {
 			if err == TokenExpired {
 				response.ReturnJSON(c, http.StatusOK, statuscode.ExprieToken.Code, statuscode.ExprieToken.Msg, nil)
-				fmt.Println(err)
 				c.Abort()
 				return
 			}
@@ -111,7 +108,6 @@ func (j *JWT) ParseToken(tokenString string) (*CustomClaims, error) {
 		return j.SigningKey, nil
 	})
 	if err != nil {
-		fmt.Println(err)
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				return nil, TokenMalformed

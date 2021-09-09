@@ -8,7 +8,6 @@ package appredis
 
 import (
 	"encoding/json"
-	"fmt"
 	"goweb/utils/parsecfg"
 	"log"
 	"time"
@@ -187,7 +186,6 @@ func GetLIkeTo(key string) (res []string, err error) {
 	defer conn.Close()
 	res, err = redis.Strings(conn.Do("KEYS", key))
 	if err != nil {
-		fmt.Println(err, "getlike")
 		return []string{}, err
 	}
 	return
@@ -260,7 +258,6 @@ func PipeLineSet(data map[string]interface{}) error {
 	conn := RedisDefaultPool.Get()
 	defer conn.Close()
 	for k, v := range data {
-		fmt.Println(k, v)
 		if err := conn.Send("set", k, v); err != nil {
 			return err
 		}
@@ -325,7 +322,6 @@ func PipeLineHset(file string, data map[string]interface{}) error {
 	conn := RedisDefaultPool.Get()
 	defer conn.Close()
 	for k, v := range data {
-		fmt.Println(k, v)
 		if err := conn.Send("hset", file, k, v); err != nil {
 			return err
 		}
@@ -350,7 +346,6 @@ func Smembers(key string) (reply []string, err error) {
 	conn := RedisDefaultPool.Get()
 	defer conn.Close()
 	reply, err = redis.Strings(conn.Do("Smembers", key))
-	fmt.Println(reply)
 	return
 }
 

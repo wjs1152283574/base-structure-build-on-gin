@@ -38,7 +38,6 @@ func InitMysql(host, port, user, pass, dbname, chaset string) {
 	// 数据链对象--mysql
 	hp := net.JoinHostPort(host, port)
 	str := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=True&loc=Local", user, pass, hp, dbname, chaset)
-	fmt.Println(str)
 	db, err := gorm.Open(parsecfg.GlobalConfig.DbType, str)
 	if err != nil {
 		panic(err)

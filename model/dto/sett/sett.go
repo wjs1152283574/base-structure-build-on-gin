@@ -77,7 +77,7 @@ type Sett struct {
 // ConBanner 联系人banner
 type ConBanner struct {
 	gorm.Model
-	SID   int    `json:"sid"`   //
+	SID   int    `json:"sid"`
 	URL   string `json:"url"`   // banner 链接
 	Image string `json:"image"` //  banner
 	Sort  int    `json:"sort"`
@@ -86,7 +86,7 @@ type ConBanner struct {
 // ConTag 联系人标签
 type ConTag struct {
 	gorm.Model
-	SID   int    `json:"sid"`   //
+	SID   int    `json:"sid"`
 	Route string `json:"route"` // 前端路由
 	Name  string `json:"name"`  // 标签名称
 	Icon  string `json:"icon"`  // 标签图标
@@ -96,7 +96,7 @@ type ConTag struct {
 // MyApp 我的应用
 type MyApp struct {
 	gorm.Model
-	SID   int    `json:"sid"`   //
+	SID   int    `json:"sid"`
 	Route string `json:"route"` // 前端路由
 	Name  string `json:"name"`
 	Icon  string `json:"icon"`
@@ -106,7 +106,7 @@ type MyApp struct {
 // Bag 钱包
 type Bag struct {
 	gorm.Model
-	SID   int    `json:"sid"` //
+	SID   int    `json:"sid"`
 	Route string `json:"route"`
 	Name  string `json:"name"`
 	Icon  string `json:"icon"`
@@ -116,7 +116,7 @@ type Bag struct {
 // NavFun 左侧菜单功能
 type NavFun struct {
 	gorm.Model
-	SID   int    `json:"sid"` //
+	SID   int    `json:"sid"`
 	Route string `json:"route"`
 	Name  string `json:"name"`
 	Icon  string `json:"icon"`

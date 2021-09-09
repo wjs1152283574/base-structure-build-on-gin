@@ -7,7 +7,7 @@ package tool
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"os"
 	"time"
 )
@@ -78,7 +78,7 @@ func PathExists(path string) (bool, error) {
 		// 创建文件夹
 		err := os.MkdirAll(path, os.ModePerm)
 		if err != nil {
-			fmt.Printf("mkdir failed![%v]\n", err)
+			log.Printf("mkdir failed![%v]\n", err)
 		} else {
 			return true, nil
 		}
@@ -131,7 +131,6 @@ func GetMaxint(s []int) []int {
 	var res []int
 	for k, v := range m {
 		if v == max {
-			fmt.Printf("出现最多数字:%d--- 出现%d次\n", k, v)
 			res = append(res, k)
 		}
 	}

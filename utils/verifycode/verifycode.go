@@ -9,8 +9,6 @@
 package verifycode
 
 import (
-	"fmt"
-
 	"github.com/mojocn/base64Captcha"
 )
 
@@ -27,7 +25,6 @@ func GetCaptcha() (string, string) {
 	// 获取
 	id, b64s, err := c.Generate()
 	if err != nil {
-		fmt.Println("Register GetCaptchaPhoto get base64Captcha has err:", err)
 		return "", ""
 	}
 	return id, b64s
