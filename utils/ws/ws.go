@@ -161,7 +161,7 @@ func (c *Client) Read() {
 // Write 写信息，从 channel 变量 Send 中读取数据写入 websocket 连接
 func (c *Client) Write() { // 解析客户端发来的数据,在此分发数据到对应的长连接通道
 	defer func() {
-		_ = c.Socket.WriteMessage(websocket.CloseMessage, []byte("socket closed by WRITE "))
+		c.Socket.WriteMessage(websocket.CloseMessage, []byte("socket closed by WRITE "))
 	}()
 	for {
 		message, ok := <-c.Message
@@ -181,9 +181,9 @@ func (c *Client) Write() { // 解析客户端发来的数据,在此分发数据�
 					msg.Group = SplitGroup(gid) // 使用已存在组名  -- 这里需要切掉:to
 				}
 				if msg.MsgType == int64(statuscode.WsCome.Code) || msg.MsgType == int64(statuscode.WsResponse.Code) || msg.MsgType == int64(statuscode.VideoChat.Code) || msg.MsgType == int64(statuscode.VoiceChat.Code) {
-					msg.To = append(msg.To, msg.From)                                                   // 组所有成员: 包括自己
-					CheckInlineOutlingSend(msg.To, msg, false)                                          // 通知目标:只发给拉起聊天人(通知双方)
-					_ = StoreCurrenGroups(msg.Group, NewGroupsDedials(msg.To, 2, 1, msg.Group, "", "")) // 改造Groups 并存入redis
+					msg.To = append(msg.To, msg.From)                                               // 组所有成员: 包括自己
+					CheckInlineOutlingSend(msg.To, msg, false)                                      // 通知目标:只发给拉起聊天人(通知双方)
+					StoreCurrenGroups(msg.Group, NewGroupsDedials(msg.To, 2, 1, msg.Group, "", "")) // 改造Groups 并存入redis
 				} else {
 					res, _ := json.Marshal(NewSendMsg("system", statuscode.WsInvaliData.Msg, "", int64(statuscode.WsInvaliData.Code)))
 					c.Socket.WriteMessage(websocket.TextMessage, res) // 发送反馈消息CheckInlineOutlingSend([]string{msg.From}, msg, false) // 通知目标
@@ -249,9 +249,9 @@ func SingleChat(msg TranstMsg) {
 				CheckInlineOutlingSend(toList, msg, true) // 发送消息 包括自己:所有群员
 			}
 		} else { // 群组不存在，则直接重新拉起群组(为了适应版本更新，可能会存在聊天组被覆盖的问题),需要区分单聊群聊（找不到群组大概率是群聊，去数据库找，目前先默认为单聊）
-			CheckInlineOutlingSend([]string{msg.From}, msg, true)                               // 通知目标:只发给拉起聊天人
-			msg.To = append(msg.To, msg.From)                                                   // 组所有成员: 包括自己
-			_ = StoreCurrenGroups(msg.Group, NewGroupsDedials(msg.To, 2, 1, msg.Group, "", "")) // 改造Groups 并存入redis
+			CheckInlineOutlingSend([]string{msg.From}, msg, true)                           // 通知目标:只发给拉起聊天人
+			msg.To = append(msg.To, msg.From)                                               // 组所有成员: 包括自己
+			StoreCurrenGroups(msg.Group, NewGroupsDedials(msg.To, 2, 1, msg.Group, "", "")) // 改造Groups 并存入redis
 		}
 	}
 }
