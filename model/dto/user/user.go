@@ -65,6 +65,11 @@ func (u *User) Check() error {
 	return mysql.DB.Where("mobile = ?", u.Mobile).First(u).Error
 }
 
+// Update 用户编辑
+func (u *User) Update() error {
+	return mysql.DB.Where("mobile = ?", u.Mobile).Updates(u).Error
+}
+
 // AdminGetList admin list
 func (u *User) AdminGetList(page, limit int) (res *[]user.AdminUserList, count int, err error) {
 	mysql.DB.Model(u).Count(&count)

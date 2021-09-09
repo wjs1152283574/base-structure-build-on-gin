@@ -5,6 +5,7 @@ import (
 	entity "goweb/model/entity/user"
 	"goweb/utils/contxtverify"
 	"goweb/utils/customerjwt"
+	"goweb/utils/datacopy"
 	"goweb/utils/passmd5"
 	"goweb/utils/response"
 	"goweb/utils/statuscode"
@@ -23,12 +24,12 @@ func SignUp(c *gin.Context) {
 		return
 	}
 	var me dto.User
-	me.Mobile = postData.Mobile
+	datacopy.DataCopy(&postData, &me)
+
 	if err := me.Check(); err == nil { // 通过 `First` API  查找, 数据不存在会报错
 		response.ReturnJSON(c, http.StatusOK, statuscode.AlreadyExit.Code, statuscode.AlreadyExit.Msg, nil)
 		return
 	}
-	me.Name = postData.Name
 	me.Pwd = passmd5.Base64Md5(postData.Mobile)
 	res, err := me.Create()
 	if err != nil {
@@ -108,4 +109,22 @@ func UserList(c *gin.Context) {
 		return
 	}
 	response.ReturnJSONPage(c, http.StatusOK, statuscode.PermitionDenid.Code, statuscode.PermitionDenid.Msg, count, res)
+}
+
+// UserUpd 用户编辑
+func UserUpd(c *gin.Context) {
+	var postData entity.UserUpdReq
+	if err := c.ShouldBind(&postData); err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		return
+	}
+
+	var me dto.User
+	datacopy.DataCopy(&postData, &me)
+
+	if err := me.Update(); err != nil {
+		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
+		return
+	}
+	response.ReturnJSON(c, http.StatusOK, statuscode.Success.Code, statuscode.Success.Msg, nil)
 }
