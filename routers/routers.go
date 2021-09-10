@@ -28,8 +28,10 @@ func InitAPIRouter() *gin.Engine {
 		gin.DefaultErrorWriter = io.MultiWriter(fileObjErr) // 指定writer
 		router.Use(gin.LoggerWithFormatter(logfmt.LogFmt))  // 自定义日志格式
 	}
+
 	router.Use(ratelimit.RateLimit()) // 限流中间件
 	router.Use(gin.Recovery())
+
 	//根据配置进行设置跨域
 	if parsecfg.GlobalConfig.AllowCrossDomain {
 		router.Use(cors.Next()) // 启用跨域中间件

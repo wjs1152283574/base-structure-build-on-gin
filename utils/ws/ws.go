@@ -2,7 +2,7 @@
  * @Author: Casso-Wong
  * @Date: 2021-06-05 10:15:44
  * @Last Modified by: Casso-Wong
- * @Last Modified time: 2021-07-15 18:19:42
+ * @Last Modified time: 2021-09-10 13:47:38
  */
 package ws
 
@@ -512,23 +512,19 @@ func (manager *Manager) Start() {
 		select {
 		// 注册
 		case client := <-manager.Register:
-			log.Printf("client: [%s] **注册********************connect****************\n", client.ID)
 			manager.Lock.Lock()                         // 加锁
 			if _, ok := manager.Group[client.ID]; !ok { // 如果是新的分组,则创建该新分组
 				manager.Group[client.ID] = client // 创建一个总管(manager)级别的分组, 但此时分组内部还是没有对应数据,只是make了内存地址
 				manager.groupCount++              // 分组即链接
 			} else { // 已有链接存在
 				res, _ := json.Marshal(NewSendMsg("system", statuscode.WsMuiltyLogin.Msg, "", int64(statuscode.WsMuiltyLogin.Code)))
-				ert := WebsocketManager.Group[client.ID].Socket.WriteMessage(websocket.TextMessage, res)
+				WebsocketManager.Group[client.ID].Socket.WriteMessage(websocket.TextMessage, res)
 				client.Socket.Close() //  服务端主动关闭连接 ,前端停止重新连接请求
-				log.Println(ert, "注册时已存在在线相同账号，强制离线！！！")
 			}
 			manager.Lock.Unlock()                                                        // 解锁
 			appredis.SetHash("onlineUser:"+client.ID, parsecfg.GlobalConfig.Kafka.Topic) // 维护在线用户，value为kafka topic
 		// 注销
 		case client := <-manager.UnRegister:
-			log.Printf("client: [%s] **注销*******disconnect********\n", client.ID)
-
 			if _, ok := manager.Group[client.ID]; ok {
 				close(client.Message)            // 在此关闭通道, 可以同步结束Write 协程 (退出死循环监听)
 				manager.Lock.Lock()              // 加锁
@@ -589,16 +585,19 @@ func (manager *Manager) WsClient(ctx *gin.Context) {
 			// 处理 Sec-WebSocket-Protocol Header
 			Subprotocols: []string{ctx.GetHeader("Sec-WebSocket-Protocol")},
 		}
+
 		conn, conErr := upGrader.Upgrade(ctx.Writer, ctx.Request, nil)
 		if conErr != nil {
 			response.ReturnJSON(ctx, http.StatusOK, statuscode.ConnectReful.Code, statuscode.ConnectReful.Msg, nil)
 			return
 		}
+
 		client := &Client{
 			ID:      tokenInfo.Name,          // 电话作为唯一的 ID
 			Socket:  conn,                    // socket链接
 			Message: make(chan []byte, 1024), // 通道内消息缓存大小
 		}
+
 		manager.RegisterClient(client) // 注册到localCahe,后期需要集群到不同节点，预测利用redis-cluster 来作为调度中心（注册时：用户标识+节点标识）
 		go client.Read()               // 阻塞处理socket消息通道读取
 		go client.Write()              // 阻塞处理socket消息通道写入
@@ -611,9 +610,10 @@ func (manager *Manager) WsClient(ctx *gin.Context) {
 func HistoryMsgs(ClientID string) {
 	history, redisErr := appredis.GetList(ClientID + ":history")
 	if redisErr != nil {
-		log.Println("历史消息获取出错!!!!") // 尝试panic ，输入日志（日志是顶层统一处理）
+		log.Panic("历史消息获取出错!!!!") // 尝试panic ，输入日志（日志是顶层统一处理）
 		return
 	}
+
 	var msglist []TranstMsg
 	for _, value := range history {
 		tempMovie := TranstMsg{}
@@ -622,9 +622,11 @@ func HistoryMsgs(ClientID string) {
 			msglist = append(msglist, tempMovie)
 		}
 	}
+
 	if len(msglist) == 0 {
 		return
 	}
+
 	// 剔除系统配置更改消息：只返回一条即可 meg_type:240
 	var sendList []TranstMsg
 	var systemNotify []TranstMsg
@@ -635,9 +637,11 @@ func HistoryMsgs(ClientID string) {
 			sendList = append(sendList, v)
 		}
 	}
+
 	if len(systemNotify) > 0 {
 		sendList = append(sendList, systemNotify[0]) // 只发一条，其余忽略
 	}
+
 	for _, v := range sendList {
 		CheckInlineOutlingSend([]string{ClientID}, v, false) // 无需存储
 	}

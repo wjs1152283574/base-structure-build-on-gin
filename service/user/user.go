@@ -23,6 +23,7 @@ func SignUp(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, nil)
 		return
 	}
+
 	var me dto.User
 	datacopy.DataCopy(&postData, &me)
 
@@ -30,18 +31,21 @@ func SignUp(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.AlreadyExit.Code, statuscode.AlreadyExit.Msg, nil)
 		return
 	}
+
 	me.Pwd = passmd5.Base64Md5(postData.Mobile)
 	res, err := me.Create()
 	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
+
 	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: res.Name, Password: postData.Pwd}
 	token, err := customerjwt.NewJWT().CreateToken(payLoad)
 	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.FailToken.Code, statuscode.FailToken.Msg, err)
 		return
 	}
+
 	response.ReturnJSON(c, http.StatusOK, statuscode.Success.Code, statuscode.Success.Msg, map[string]interface{}{
 		"infos": res,
 		"token": token,
@@ -55,6 +59,7 @@ func GetUser(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.InvalidParam.Code, statuscode.InvalidParam.Msg, err)
 		return
 	}
+
 	var me dto.User
 	me.ID = uint(id)
 	res, err := me.Get()
@@ -62,6 +67,7 @@ func GetUser(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
+
 	response.ReturnJSON(c, http.StatusOK, statuscode.Success.Code, statuscode.Success.Msg, res)
 }
 
@@ -72,12 +78,14 @@ func SignIn(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
+
 	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: postData.Name, Password: postData.Pass}
 	token, err := customerjwt.NewJWT().CreateToken(payLoad)
 	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
+
 	response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, map[string]interface{}{
 		"token": token,
 	})
@@ -96,12 +104,14 @@ func UserList(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.PermitionDenid.Code, statuscode.PermitionDenid.Msg, err)
 		return
 	}
+
 	var u dto.User
 	res, count, err := u.AdminGetList(page, limit)
 	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
+
 	response.ReturnJSONPage(c, http.StatusOK, statuscode.PermitionDenid.Code, statuscode.PermitionDenid.Msg, count, res)
 }
 
@@ -120,5 +130,6 @@ func UserUpd(c *gin.Context) {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
+
 	response.ReturnJSON(c, http.StatusOK, statuscode.Success.Code, statuscode.Success.Msg, nil)
 }

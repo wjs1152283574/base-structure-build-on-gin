@@ -1,8 +1,8 @@
 /*
  * @Author: Casso-Wong
  * @Date: 2021-06-05 10:13:40
- * @Last Modified by:   Casso-Wong
- * @Last Modified time: 2021-06-05 10:13:40
+ * @Last Modified by: Casso-Wong
+ * @Last Modified time: 2021-09-10 11:16:56
  */
 package alimsg
 
@@ -31,9 +31,11 @@ func Code() (res string) {
 	if n != 6 {
 		panic(err)
 	}
+
 	for i := 0; i < len(b); i++ {
 		b[i] = table[int(b[i])%len(table)]
 	}
+
 	res = string(b)
 	if res[0] == '0' {
 		res = Code()
@@ -48,9 +50,11 @@ func OrderCode() (res string) {
 	if n != 11 {
 		panic(err)
 	}
+
 	for i := 0; i < len(b); i++ {
 		b[i] = table[int(b[i])%len(table)]
 	}
+
 	res = string(b)
 	return
 }

@@ -1,8 +1,8 @@
 /*
  * @Author: Casso-Wong
  * @Date: 2021-06-04 14:41:27
- * @Last Modified by:   Casso-Wong
- * @Last Modified time: 2021-06-04 14:41:27
+ * @Last Modified by: Casso-Wong
+ * @Last Modified time: 2021-09-10 11:15:49
  */
 package mysql
 
@@ -42,6 +42,7 @@ func InitMysql(host, port, user, pass, dbname, chaset string) {
 	if err != nil {
 		panic(err)
 	}
+
 	// SetMaxIdleCons 设置连接池中的最大闲置连接数。
 	db.DB().SetMaxIdleConns(parsecfg.GlobalConfig.Mysql.Write.SetMaxIdleConns)
 
