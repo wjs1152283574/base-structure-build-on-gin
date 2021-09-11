@@ -1,8 +1,8 @@
 /*
  * @Author: Casso-Wong
  * @Date: 2021-06-05 10:13:59
- * @Last Modified by:   Casso-Wong
- * @Last Modified time: 2021-06-05 10:13:59
+ * @Last Modified by: Casso-Wong
+ * @Last Modified time: 2021-09-11 15:06:51
  */
 package parsecfg
 
@@ -34,6 +34,7 @@ type EnvCfg struct {
 	RateLimit        int
 	Kafka            Kafka
 	OpenApi          Open
+	TripleDes        Triple
 }
 
 // MysqlCfg mysql配置
@@ -103,6 +104,12 @@ type Kafka struct {
 type Open struct {
 	Key    string
 	Domian string
+}
+
+// TripleDes
+type Triple struct {
+	Key string
+	Iv  string
 }
 
 func init() {

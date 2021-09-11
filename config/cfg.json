@@ -25,19 +25,6 @@
             "SetMaxOpenConns":128,
             "SetConnMaxLifetime":60,
             "ReConnectInterval":1
-        },
-        "Read":{
-            "Host":"127.0.0.1",
-            "DataBase":"goweb",
-            "Port":"3306",
-            "PreFix":"cs_",
-            "User":"root",
-            "PassWord":"******",
-            "Charset":"utf8",
-            "SetMaxIdleConns":10,
-            "SetMaxOpenConns":128,
-            "SetConnMaxLifetime":60,
-            "ReConnectInterval":1
         }
     },
     "Redis":{
@@ -61,5 +48,13 @@
         "Port":":9092",
         "Auth":"wjs123456.",
         "Topic":"transer"
+    },
+    "OpenApi":{
+        "Key":"hb********_bhbasHOB",
+        "Domian":"http://baidu.com/openapi"
+    },
+    "TripleDes":{
+        "Key":"abcdefghijklmnopq",
+        "Iv":"qakmvrex"
     }
 }

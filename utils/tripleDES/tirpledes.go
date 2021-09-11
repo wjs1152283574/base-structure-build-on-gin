@@ -14,7 +14,15 @@ import (
 	"crypto/cipher"
 	"crypto/des"
 	"encoding/base64"
+	"goweb/utils/parsecfg"
 )
+
+var GlobalTripleDES TripleDES
+
+func init() {
+	GlobalTripleDES.key = parsecfg.GlobalConfig.TripleDes.Key
+	GlobalTripleDES.iv = parsecfg.GlobalConfig.TripleDes.Iv
+}
 
 // TripleDES  key & iv
 type TripleDES struct {
