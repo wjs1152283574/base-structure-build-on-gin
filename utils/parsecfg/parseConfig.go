@@ -2,7 +2,7 @@
  * @Author: Casso-Wong
  * @Date: 2021-06-05 10:13:59
  * @Last Modified by: Casso-Wong
- * @Last Modified time: 2021-09-11 15:06:51
+ * @Last Modified time: 2021-09-17 00:31:01
  */
 package parsecfg
 
@@ -32,26 +32,23 @@ type EnvCfg struct {
 	Redis            RedisCfg
 	Timer            TimerCfg
 	RateLimit        int
-	Kafka            Kafka
-	OpenApi          Open
-	TripleDes        Triple
+	Kafka            KafkaCfg
+	OpenApi          OpenCfg
+	TripleDes        TripleCfg
 }
 
 // MysqlCfg mysql配置
 type MysqlCfg struct {
-	Write MysqlWriteCfg
-	Read  MysqlReadCfg
+	Dev   MysqlDevCfg
+	Prod  MysqlProdCfg
+	Stage MysqlStageCfg
 }
 
-// MysqlWriteCfg mysql配置
-type MysqlWriteCfg struct {
+// MysqlDevCfg mysql dev 配置
+type MysqlDevCfg struct {
 	Host            string
-	HostLive        string
 	DataBase        string
 	Port            string
-	PortLive        string
-	HostStage       string
-	PortStage       string
 	PreFix          string
 	User            string
 	PassWord        string
@@ -60,8 +57,8 @@ type MysqlWriteCfg struct {
 	Charset         string
 }
 
-// MysqlReadCfg mysql配置
-type MysqlReadCfg struct {
+// MysqlProdCfg mysql prod 配置
+type MysqlProdCfg struct {
 	Host            string
 	DataBase        string
 	Port            string
@@ -70,18 +67,54 @@ type MysqlReadCfg struct {
 	PassWord        string
 	SetMaxIdleConns int
 	SetMaxOpenConns int
-	ChatSet         string
+	Charset         string
+}
+
+// MysqlStageCfg mysql stage 配置
+type MysqlStageCfg struct {
+	Host            string
+	DataBase        string
+	Port            string
+	PreFix          string
+	User            string
+	PassWord        string
+	SetMaxIdleConns int
+	SetMaxOpenConns int
+	Charset         string
 }
 
 // RedisCfg redis配置
 type RedisCfg struct {
+	Dev   RedisDevCfg
+	Prod  RedisProdCfg
+	Stage RedisStageCfg
+}
+
+// RedisDevCfg redis dev 配置
+type RedisDevCfg struct {
 	Host        string
-	HostLive    string
 	Port        string
-	PortLive    string
 	Auth        string
-	HostStage   string
-	PortStage   string
+	MaxIdle     int
+	MaxActive   int
+	IdleTimeout int
+}
+
+// RedisProdCfg redis prod 配置
+type RedisProdCfg struct {
+	Host        string
+	Port        string
+	Auth        string
+	MaxIdle     int
+	MaxActive   int
+	IdleTimeout int
+}
+
+// RedisStageCfg redis stage 配置
+type RedisStageCfg struct {
+	Host        string
+	Port        string
+	Auth        string
 	MaxIdle     int
 	MaxActive   int
 	IdleTimeout int
@@ -92,8 +125,31 @@ type TimerCfg struct {
 	Store string
 }
 
-// Kafka
-type Kafka struct {
+// KafkaCfg kafka 配置
+type KafkaCfg struct {
+	Dev   KafkaDevCfg
+	Prod  KafkaProdCfg
+	Stage KafkaStageCfg
+}
+
+// KafkaDevCfg kafka dev 配置
+type KafkaDevCfg struct {
+	Host  string
+	Port  string
+	Auth  string
+	Topic string
+}
+
+// KafkaProdCfg kafka prod 配置
+type KafkaProdCfg struct {
+	Host  string
+	Port  string
+	Auth  string
+	Topic string
+}
+
+// KafkaStageCfg kafka stage 配置
+type KafkaStageCfg struct {
 	Host  string
 	Port  string
 	Auth  string
@@ -101,13 +157,13 @@ type Kafka struct {
 }
 
 // Open
-type Open struct {
+type OpenCfg struct {
 	Key    string
 	Domian string
 }
 
 // TripleDes
-type Triple struct {
+type TripleCfg struct {
 	Key string
 	Iv  string
 }
