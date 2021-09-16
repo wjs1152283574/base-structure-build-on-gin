@@ -1,60 +1,120 @@
 {
-    "Debug":false,
-    "DbType":"mysql",
-    "Port":":9000",
-    "AllowCrossDomain":true,
-    "SuperUser1":"17620439807",
-    "SuperUser2":"17620439808",
-    "SuperUser3":"17620439809",
-    "Pass":"*****",
-    "Env":"dev",  
-    "RateLimit":100,
-    "Mysql":{
-        
-        "Write":{
-            "Host":"127.0.0.1",
-            "HostLive":"*********",
-            "DataBase":"goweb",
-            "Port":"3306",
-            "PortLive":"3306",
-            "PreFix":"cs_",
-            "User":"root",
-            "PassWord":"password",                  
-            "Charset":"utf8",
-            "SetMaxIdleConns":10,
-            "SetMaxOpenConns":128,
-            "SetConnMaxLifetime":60,
-            "ReConnectInterval":1
+    "Debug": false,
+    "DbType": "mysql",
+    "Port": ":9000",
+    "AllowCrossDomain": true,
+    "SuperUser1": "17620439807",
+    "SuperUser2": "17620439808",
+    "SuperUser3": "17620439809",
+    "Pass": "casso",
+    "环境": "dev:开发环境；prod:内测环境；stage:稳定发布",
+    "Env": "dev",
+    "RateLimit": 100,
+    "Mysql": {
+        "Dev": {
+            "Host": "127.0.0.1",
+            "DataBase": "goweb",
+            "Port": "3306",
+            "PreFix": "cs_",
+            "User": "root",
+            "PassWord": "password",
+            "Charset": "utf8",
+            "SetMaxIdleConns": 10,
+            "SetMaxOpenConns": 128,
+            "SetConnMaxLifetime": 60,
+            "ReConnectInterval": 1
+        },
+        "Prod": {
+            "Host": "127.0.0.1",
+            "DataBase": "goweb",
+            "Port": "3306",
+            "PreFix": "cs_",
+            "User": "root",
+            "PassWord": "password",
+            "Charset": "utf8",
+            "SetMaxIdleConns": 10,
+            "SetMaxOpenConns": 128,
+            "SetConnMaxLifetime": 60,
+            "ReConnectInterval": 1
+        },
+        "Stage": {
+            "Host": "127.0.0.1",
+            "DataBase": "goweb",
+            "Port": "3306",
+            "PreFix": "cs_",
+            "User": "root",
+            "PassWord": "password",
+            "Charset": "utf8",
+            "SetMaxIdleConns": 10,
+            "SetMaxOpenConns": 128,
+            "SetConnMaxLifetime": 60,
+            "ReConnectInterval": 1
         }
     },
-    "Redis":{
-        "Host":"127.0.0.1",
-        "HostLive":"*********",
-        "Port":"6379",
-        "PortLive":"6379",
-        "Auth":".******",
-        "MaxIdle":10,
-        "MaxActive":1000,
-        "IdleTimeout":30,
-        "IndexDb":1,
-        "ConnFailRetryTimes":3,
-        "ReConnectInterval":1
+    "Redis": {
+        "Dev": {
+            "Host": "127.0.0.1",
+            "Port": "6379",
+            "Auth": "casso",
+            "MaxIdle": 10,
+            "MaxActive": 1000,
+            "IdleTimeout": 30,
+            "IndexDb": 1,
+            "ConnFailRetryTimes": 3,
+            "ReConnectInterval": 1
+        },
+        "Prod": {
+            "Host": "127.0.0.1",
+            "Port": "6379",
+            "Auth": "casso",
+            "MaxIdle": 10,
+            "MaxActive": 1000,
+            "IdleTimeout": 30,
+            "IndexDb": 1,
+            "ConnFailRetryTimes": 3,
+            "ReConnectInterval": 1
+        },
+        "Stage": {
+            "Host": "127.0.0.1",
+            "Port": "6379",
+            "Auth": "casso",
+            "MaxIdle": 10,
+            "MaxActive": 1000,
+            "IdleTimeout": 30,
+            "IndexDb": 1,
+            "ConnFailRetryTimes": 3,
+            "ReConnectInterval": 1
+        }
     },
-    "Timer":{
-        "Store":"* * * * * *"  
+    "Timer": {
+        "Store": "* * * * * *"
     },
-    "Kafka":{
-        "Host":"127.0.0.1",
-        "Port":":9092",
-        "Auth":"wjs123456.",
-        "Topic":"transer"
+    "Kafka": {
+        "Dev": {
+            "Host": "127.0.0.1",
+            "Port": ":9092",
+            "Auth": "wjs123456.",
+            "Topic": "transer"
+        },
+        "Prod": {
+            "Host": "127.0.0.1",
+            "Port": ":9092",
+            "Auth": "wjs123456.",
+            "Topic": "transer"
+        },
+        "Stage": {
+            "Host": "127.0.0.1",
+            "Port": ":9092",
+            "Auth": "wjs123456.",
+            "Topic": "transer"
+        }
     },
-    "OpenApi":{
-        "Key":"hb********_bhbasHOB",
-        "Domian":"http://baidu.com/openapi"
+    "OpenApi": {
+        "Key": "hb********_bhbasHOB",
+        "Domian": "http://baidu.com/openapi"
     },
-    "TripleDes":{
-        "Key":"abcdefghijklmnopq",
-        "Iv":"qakmvrex"
+    "TripleDes": {
+        "Key": "abcdefghijklmnopq",
+        "Iv": "qakmvrex"
     }
 }
