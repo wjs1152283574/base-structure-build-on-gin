@@ -2,7 +2,7 @@
  * @Author: Casso-Wong
  * @Date: 2021-06-05 10:15:44
  * @Last Modified by: Casso-Wong
- * @Last Modified time: 2021-09-10 13:47:38
+ * @Last Modified time: 2021-09-17 00:56:29
  */
 package ws
 
@@ -12,7 +12,7 @@ import (
 	appredis "goweb/dao/redis"
 	"goweb/utils/alimsg"
 	"goweb/utils/customerjwt"
-	"goweb/utils/parsecfg"
+	"goweb/utils/kafka"
 	"goweb/utils/response"
 	"goweb/utils/sencekw"
 	"goweb/utils/statuscode"
@@ -521,8 +521,8 @@ func (manager *Manager) Start() {
 				WebsocketManager.Group[client.ID].Socket.WriteMessage(websocket.TextMessage, res)
 				client.Socket.Close() //  服务端主动关闭连接 ,前端停止重新连接请求
 			}
-			manager.Lock.Unlock()                                                        // 解锁
-			appredis.SetHash("onlineUser:"+client.ID, parsecfg.GlobalConfig.Kafka.Topic) // 维护在线用户，value为kafka topic
+			manager.Lock.Unlock()                                       // 解锁
+			appredis.SetHash("onlineUser:"+client.ID, kafka.KafkaTopic) // 维护在线用户，value为kafka topic
 		// 注销
 		case client := <-manager.UnRegister:
 			if _, ok := manager.Group[client.ID]; ok {

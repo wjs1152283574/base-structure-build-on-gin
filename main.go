@@ -7,6 +7,8 @@ import (
 	"goweb/utils/timer"
 )
 
+var Kafka = "haha"
+
 func main() {
 	defer mysql.DB.Close()                                  // 预操作: 关闭 数据库连接
 	defer timer.Conrs.Stop()                                // 预操作: 关闭定时器任务

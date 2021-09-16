@@ -1,8 +1,8 @@
 /*
  * @Author: Casso-Wong
  * @Date: 2021-06-04 14:41:32
- * @Last Modified by:   Casso-Wong
- * @Last Modified time: 2021-06-04 14:41:32
+ * @Last Modified by: Casso-Wong
+ * @Last Modified time: 2021-09-17 00:51:10
  */
 package appredis
 
@@ -22,25 +22,45 @@ var RedisDefaultPool *redis.Pool
 
 func init() {
 	if parsecfg.GlobalConfig.Env == "dev" {
-		RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.Host, parsecfg.GlobalConfig.Redis.Port, parsecfg.GlobalConfig.Redis.Auth, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive, 12)
+		RedisDefaultPool = NewPool(
+			parsecfg.GlobalConfig.Redis.Dev.Host,
+			parsecfg.GlobalConfig.Redis.Dev.Port,
+			parsecfg.GlobalConfig.Redis.Dev.Auth,
+			parsecfg.GlobalConfig.Redis.Dev.MaxIdle,
+			parsecfg.GlobalConfig.Redis.Dev.MaxActive,
+			parsecfg.GlobalConfig.Redis.Dev.IdleTimeout,
+			parsecfg.GlobalConfig.Redis.Dev.IndexDb)
 	}
 	if parsecfg.GlobalConfig.Env == "prod" {
-		RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.HostLive, parsecfg.GlobalConfig.Redis.PortLive, parsecfg.GlobalConfig.Redis.Auth, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive, 12)
+		RedisDefaultPool = NewPool(
+			parsecfg.GlobalConfig.Redis.Prod.Host,
+			parsecfg.GlobalConfig.Redis.Prod.Port,
+			parsecfg.GlobalConfig.Redis.Prod.Auth,
+			parsecfg.GlobalConfig.Redis.Prod.MaxIdle,
+			parsecfg.GlobalConfig.Redis.Prod.MaxActive,
+			parsecfg.GlobalConfig.Redis.Prod.IdleTimeout,
+			parsecfg.GlobalConfig.Redis.Prod.IndexDb)
 	}
-	// if parsecfg.GlobalConfig.Env == "stage" {
-	// 	RedisDefaultPool = NewPool(parsecfg.GlobalConfig.Redis.HostStage, parsecfg.GlobalConfig.Redis.PortStage, parsecfg.GlobalConfig.Redis.Auth, parsecfg.GlobalConfig.Redis.MaxIdle, parsecfg.GlobalConfig.Redis.MaxActive, parsecfg.GlobalConfig.Redis.IdleTimeout)
-	// }
-	// RedisDefaultPool = NewPool("182.92.186.214", "6379", "wjs123456.", 23, 100, 300) // this is my docker redis-container for local redis_testing
+	if parsecfg.GlobalConfig.Env == "stage" {
+		RedisDefaultPool = NewPool(
+			parsecfg.GlobalConfig.Redis.Stage.Host,
+			parsecfg.GlobalConfig.Redis.Stage.Port,
+			parsecfg.GlobalConfig.Redis.Stage.Auth,
+			parsecfg.GlobalConfig.Redis.Stage.MaxIdle,
+			parsecfg.GlobalConfig.Redis.Stage.MaxActive,
+			parsecfg.GlobalConfig.Redis.Stage.IdleTimeout,
+			parsecfg.GlobalConfig.Redis.Stage.IndexDb)
+	}
 	log.Println("redis init finished...")
 }
 
 // NewPool 项目运行初始化redis连接池
-func NewPool(addr, port, auth string, max, maxactive, IdleTimeout int) *redis.Pool { // 传入 ip:port 最大闲置连接数 最大活跃连接数
+func NewPool(addr, port, auth string, max, maxactive, Idletimeout, indexdb int) *redis.Pool { // 传入 ip:port 最大闲置连接数 最大活跃连接数
 	str := addr + ":" + port
 	return &redis.Pool{
 		MaxIdle:     max,
 		MaxActive:   maxactive,
-		IdleTimeout: time.Duration(IdleTimeout) * time.Second,
+		IdleTimeout: time.Duration(Idletimeout) * time.Second,
 		Wait:        true, // 开启超时等待(获取连接等待)
 		Dial: func() (redis.Conn, error) {
 			c, err := redis.Dial("tcp", str)
@@ -51,7 +71,7 @@ func NewPool(addr, port, auth string, max, maxactive, IdleTimeout int) *redis.Po
 				c.Close()
 				return nil, err
 			}
-			if _, err := c.Do("SELECT", 0); err != nil {
+			if _, err := c.Do("SELECT", indexdb); err != nil {
 				c.Close()
 				return nil, err
 			}

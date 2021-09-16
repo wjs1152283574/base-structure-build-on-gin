@@ -2,7 +2,7 @@
  * @Author: Casso-Wong
  * @Date: 2021-06-05 10:13:59
  * @Last Modified by: Casso-Wong
- * @Last Modified time: 2021-09-17 00:31:01
+ * @Last Modified time: 2021-09-17 00:47:28
  */
 package parsecfg
 
@@ -95,6 +95,7 @@ type RedisDevCfg struct {
 	Host        string
 	Port        string
 	Auth        string
+	IndexDb     int
 	MaxIdle     int
 	MaxActive   int
 	IdleTimeout int
@@ -105,6 +106,7 @@ type RedisProdCfg struct {
 	Host        string
 	Port        string
 	Auth        string
+	IndexDb     int
 	MaxIdle     int
 	MaxActive   int
 	IdleTimeout int
@@ -115,6 +117,7 @@ type RedisStageCfg struct {
 	Host        string
 	Port        string
 	Auth        string
+	IndexDb     int
 	MaxIdle     int
 	MaxActive   int
 	IdleTimeout int
