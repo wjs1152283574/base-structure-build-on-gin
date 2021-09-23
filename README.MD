@@ -44,8 +44,7 @@
 3. `go env -w GOPROXY=https://goproxy.io,direct`
 4. `go env -w GOPRIVATE=*.corp.example.com`
 5. 扩展管理--代理设置（默认override，改成on）
-6. 重启，安装成功
-7. 内存逃逸分析：`go build -gcflags '-m'`
+6. 内存逃逸分析：`go build -gcflags '-m'`
 
 
 #### Commit 规范
