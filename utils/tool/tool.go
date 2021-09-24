@@ -1,8 +1,3 @@
-/*
- * @Description:常用工具
- * @Author: Casso-Wong
- */
-
 package tool
 
 import (
