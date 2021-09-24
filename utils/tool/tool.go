@@ -13,7 +13,7 @@ func ParseSlicess(slc []string) []string {
 	temMap := make(map[string]bool, len(slc))
 	for _, v := range slc {
 		if v != "" {
-			if temMap[v] == false {
+			if temMap[v] {
 				temMap[v] = true
 				res = append(res, v)
 			}
@@ -51,10 +51,9 @@ func StartToday() time.Time {
 // GetTimesDiffer 获取相差时间秒数
 func GetTimesDiffer(stime, etime string) (res int64, errs error) {
 	t1, err := time.ParseInLocation("2006-01-02 15:04:05", stime, time.Local)
-	t2, err := time.ParseInLocation("2006-01-02 15:04:05", etime, time.Local)
-	if err == nil && t1.Before(t2) {
-		res = t2.Unix() - t1.Unix() //
-		// hour = diff / 3600
+	t2, err2 := time.ParseInLocation("2006-01-02 15:04:05", etime, time.Local)
+	if err == nil && err2 == nil && t1.Before(t2) {
+		res = t2.Unix() - t1.Unix()
 		errs = nil
 	} else {
 		res = 0

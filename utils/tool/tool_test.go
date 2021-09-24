@@ -5,6 +5,29 @@ import (
 	"testing"
 )
 
+func TestParseSlicess(t *testing.T) {
+	// type test struct {
+	// 	source []string
+	// 	res    []string
+	// }
+	// tests := []test{
+	// 	{source: []string{"aa", "bb", "cc"}, res: []string{"gg", "qq"}},
+	// 	{source: []string{"ww", "qq"}, res: []string{"tt", "jj"}},
+	// }
+	// for _, v := range tests {
+	// 	final := GetMaxint(v.source)
+	// 	if !reflect.DeepEqual(v.res, final) {
+	// 		t.Errorf("want:%#v,got:%#v", v.res, final)
+	// 	}
+	// }
+	source := []string{"aa", "bb", "cc", "cc"}
+	res := []string{"aa", "bb", "cc"}
+	res2 := ParseSlicess(source)
+	if reflect.DeepEqual(res, res2) {
+		t.Errorf("ss")
+	}
+}
+
 func TestDeledeSlice(t *testing.T) {
 	type test struct {
 		source []string
