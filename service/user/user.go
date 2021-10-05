@@ -73,19 +73,26 @@ func GetUser(c *gin.Context) {
 
 // SignIn 用户登陆 签发token
 func SignIn(c *gin.Context) {
+	// 接收数据
 	var postData entity.SignInReq
 	if err := c.ShouldBind(&postData); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
-
-	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: postData.Name, Password: postData.Pass}
+	// 验证用户合法性
+	var me dto.User
+	datacopy.DataCopy(&postData, &me)
+	if err := me.Check(); err == nil { // 通过 `First` API  查找, 数据不存在会报错
+		response.ReturnJSON(c, http.StatusOK, statuscode.AlreadyExit.Code, statuscode.AlreadyExit.Msg, nil)
+		return
+	}
+	// 生成token
+	var payLoad = customerjwt.CustomClaims{ID: int64(me.ID)}
 	token, err := customerjwt.NewJWT().CreateToken(payLoad)
 	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, err)
 		return
 	}
-
 	response.ReturnJSON(c, http.StatusOK, statuscode.Faillure.Code, statuscode.Faillure.Msg, map[string]interface{}{
 		"token": token,
 	})
