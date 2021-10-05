@@ -62,7 +62,7 @@ func (u *User) Get() (res *user.ResUser, err error) {
 
 // Check 检测用户电话是否存在
 func (u *User) Check() error {
-	return mysql.DB.Where("mobile = ?", u.Mobile).First(u).Error
+	return mysql.DB.First(u).Error
 }
 
 // Update 用户编辑

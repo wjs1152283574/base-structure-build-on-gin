@@ -11,7 +11,6 @@ import (
 	"goweb/utils/statuscode"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,7 +38,7 @@ func SignUp(c *gin.Context) {
 		return
 	}
 
-	var payLoad = customerjwt.CustomClaims{TimeStr: time.Now().Format("2006-01-02 15:04:05"), Name: res.Name, Password: postData.Pwd}
+	var payLoad = customerjwt.CustomClaims{ID: int64(res.ID)}
 	token, err := customerjwt.NewJWT().CreateToken(payLoad)
 	if err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.FailToken.Code, statuscode.FailToken.Msg, err)
@@ -106,8 +105,8 @@ func UserList(c *gin.Context) {
 		return
 	}
 
-	mobile := c.GetString("mobile")
-	if err := contxtverify.CheckAdmin(mobile); err != nil {
+	userID, _ := strconv.Atoi(c.GetString("userID"))
+	if err := contxtverify.CheckAdmin(uint(userID)); err != nil {
 		response.ReturnJSON(c, http.StatusOK, statuscode.PermitionDenid.Code, statuscode.PermitionDenid.Msg, err)
 		return
 	}

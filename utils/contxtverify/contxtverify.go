@@ -27,9 +27,9 @@ func CheckPageLimit(c *gin.Context) (page, limit int, err error) {
 }
 
 // CheckAdmin is or not; can be use for admin user checkking
-func CheckAdmin(mobile string) error {
+func CheckAdmin(userID uint) error {
 	var u dto.User
-	u.Mobile = mobile
+	u.ID = uint(userID)
 	if err := u.Check(); err != nil {
 		return err
 	}
