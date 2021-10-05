@@ -50,7 +50,7 @@ func JWTAuth() gin.HandlerFunc {
 			return
 		}
 		// 继续交由下一个路由处理,并将解析出的信息传递下去
-		c.Set("mobile", claims.Name)
+		c.Set("userID", claims.ID)
 	}
 }
 
@@ -70,9 +70,7 @@ var (
 
 // CustomClaims 载荷，可以加一些自己需要的信息
 type CustomClaims struct {
-	Name     string `json:"name"`
-	Password string `json:"pwd"`
-	TimeStr  string `json:"timestr"`
+	ID int64 `json:"id"` // 用户ID
 	jwt.StandardClaims
 }
 
@@ -140,7 +138,7 @@ func (j *JWT) RefreshToken(tokenString string) (string, error) {
 	}
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		jwt.TimeFunc = time.Now
-		claims.StandardClaims.ExpiresAt = time.Now().Add(1 * time.Hour).Unix()
+		claims.StandardClaims.ExpiresAt = time.Now().Add(12 * time.Hour).Unix()
 		return j.CreateToken(*claims)
 	}
 	return "", TokenInvalid
