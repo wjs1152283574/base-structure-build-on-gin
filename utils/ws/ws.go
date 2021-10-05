@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	appredis "goweb/dao/redis"
+	dto "goweb/model/dto/user"
 	"goweb/utils/alimsg"
 	"goweb/utils/customerjwt"
 	"goweb/utils/kafka"
@@ -592,8 +593,17 @@ func (manager *Manager) WsClient(ctx *gin.Context) {
 			return
 		}
 
+		// 检测用户合法性
+		var me dto.User
+		me.ID = uint(tokenInfo.ID)
+		if err := me.Check(); err != nil {
+			response.ReturnJSON(ctx, http.StatusOK, statuscode.UserNotExit.Code, statuscode.UserNotExit.Msg, nil)
+			return
+		}
+
+		// 生成websocket client 并处理
 		client := &Client{
-			ID:      tokenInfo.Name,          // 电话作为唯一的 ID
+			ID:      me.Mobile,               // 电话作为唯一的 ID
 			Socket:  conn,                    // socket链接
 			Message: make(chan []byte, 1024), // 通道内消息缓存大小
 		}
