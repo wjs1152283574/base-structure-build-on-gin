@@ -14,26 +14,20 @@ import (
 	"crypto/cipher"
 	"crypto/des"
 	"encoding/base64"
-	"goweb/utils/parsecfg"
 )
 
 var GlobalTripleDES TripleDES
 
-func init() {
-	GlobalTripleDES.key = parsecfg.GlobalConfig.TripleDes.Key
-	GlobalTripleDES.iv = parsecfg.GlobalConfig.TripleDes.Iv
-}
-
 // TripleDES  key & iv
 type TripleDES struct {
-	key string
-	iv  string
+	Key string
+	Iv  string
 }
 
 // Encrypt encrypt
 func (t *TripleDES) Encrypt(plain string) (string, error) {
-	key := []byte(t.key)
-	iv := []byte(t.iv)
+	key := []byte(t.Key)
+	iv := []byte(t.Iv)
 
 	block, err := des.NewTripleDESCipher(key)
 	if err != nil {
@@ -50,8 +44,8 @@ func (t *TripleDES) Encrypt(plain string) (string, error) {
 
 // Decrypt decry
 func (t *TripleDES) Decrypt(secret string) (string, error) {
-	key := []byte(t.key)
-	iv := []byte(t.iv)
+	key := []byte(t.Key)
+	iv := []byte(t.Iv)
 
 	crypted, err := base64.StdEncoding.DecodeString(secret)
 	if err != nil {

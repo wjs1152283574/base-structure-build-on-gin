@@ -1,6 +1,7 @@
-package tool
+package tests
 
 import (
+	"goweb/utils/tool"
 	"reflect"
 	"testing"
 )
@@ -22,7 +23,7 @@ func TestParseSlicess(t *testing.T) {
 	// }
 	source := []string{"aa", "bb", "cc", "cc"}
 	res := []string{"aa", "bb", "cc"}
-	res2 := ParseSlicess(source)
+	res2 := tool.ParseSlicess(source)
 	if reflect.DeepEqual(res, res2) {
 		t.Errorf("ss")
 	}
@@ -39,7 +40,7 @@ func TestDeledeSlice(t *testing.T) {
 		{source: []string{"17620439807", "17620439808", "17620439809"}, target: "17620439807", res: []string{"17620439808", "17620439809"}},
 	}
 	for _, v := range tests {
-		final := DeledeSlice(v.source, v.target)
+		final := tool.DeledeSlice(v.source, v.target)
 		if !reflect.DeepEqual(v.res, final) {
 			t.Errorf("want:%#v,got:%#v", v.res, final)
 		}
@@ -56,7 +57,7 @@ func TestGetMax(t *testing.T) {
 		{source: []int{1, 1, 1, 2, 5, 6}, res: []int{1}},
 	}
 	for _, v := range tests {
-		final := GetMaxint(v.source)
+		final := tool.GetMaxint(v.source)
 		if !reflect.DeepEqual(v.res, final) {
 			t.Errorf("want:%#v,got:%#v", v.res, final)
 		}

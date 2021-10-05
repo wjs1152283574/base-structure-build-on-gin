@@ -1,6 +1,9 @@
-package sencekw
+package tests
 
-import "testing"
+import (
+	"goweb/utils/sencekw"
+	"testing"
+)
 
 func TestGetSencitiveResponse(t *testing.T) {
 	type test struct {
@@ -13,7 +16,7 @@ func TestGetSencitiveResponse(t *testing.T) {
 		{source: "asdasdaFuc*k", target: "asdasda*****"},
 	}
 	for _, v := range tests {
-		final := GetSencitiveResponse(v.source)
+		final := sencekw.GetSencitiveResponse(v.source)
 		if v.target != final {
 			t.Errorf("want:%#v,got:%#v", v.res, final)
 		}

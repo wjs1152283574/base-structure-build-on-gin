@@ -1,6 +1,15 @@
-package datacopy
+/*
+ * @PackageName: tests
+ * @Description: 数据复制单元测试
+ * @Author: Casso-Wong
+ * @Date: 2021-10-05 14:32:15
+ * @Last Modified by: Casso-Wong
+ * @Last Modified time: 2021-10-05 14:32:15
+ */
+package tests
 
 import (
+	"goweb/utils/datacopy"
 	"testing"
 )
 
@@ -24,7 +33,7 @@ func TestDataCopy(t *testing.T) {
 		Gender: 1,
 	}
 	s := Stu{}
-	if err := DataCopy(&p, &s); err != nil || s.Name == "" || s.Test != "" {
+	if err := datacopy.DataCopy(&p, &s); err != nil || s.Name == "" || s.Test != "" {
 		t.Error(err)
 	}
 }

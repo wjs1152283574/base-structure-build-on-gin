@@ -1,12 +1,13 @@
-package tripledes
+package tests
 
 import (
+	tripledes "goweb/utils/tripleDES"
 	"testing"
 )
 
-var tdes = TripleDES{
-	key: "hahaasdasdashahaasdasdas",
-	iv:  "qakmvrex",
+var tdes = tripledes.TripleDES{
+	Key: "hahaasdasdashahaasdasdas",
+	Iv:  "qakmvrex",
 }
 
 func TestEncrypt(t *testing.T) {
