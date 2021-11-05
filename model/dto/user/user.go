@@ -35,6 +35,10 @@ type Msg struct {
 	Msg string `json:"msg"`
 }
 
+func Adult(db *gorm.DB) *gorm.DB {
+	return db.Where("age > ?", 18)
+}
+
 // AfterCreate 创建 User 之后执行得钩子函数 --- 自动执行
 func (u *User) AfterCreate(scope *gorm.Scope) error {
 	return scope.DB().Model(u).Update("role", "admin").Error
