@@ -80,6 +80,12 @@ func (u *User) AdminGetList(page, limit int) (res *[]user.AdminUserList, count i
 	return res, count, mysql.DB.Model(u).Limit(limit).Offset((page - 1) * limit).Scan(res).Error
 }
 
+// AdminGetListByPoint 大数据量列表查询
+func (u *User) AdminGetListByPoint(id, limit int64) (res *[]user.AdminUserList, count int, err error) {
+	mysql.DB.Model(u).Count(&count)
+	return res, count, mysql.DB.Model(u).Where("id > ?", id).Limit(limit).Scan(res).Error
+}
+
 // GetFrontU get for send all
 func (u *User) GetFrontU(res *[]user.GetSendAll) error {
 	return mysql.DB.Model(u).Where("deleted_at is null").Scan(res).Error
