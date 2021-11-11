@@ -13,6 +13,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// JWT 签名结构
+type JWT struct {
+	SigningKey []byte
+}
+
+// TokenExpired 一些常量
+var (
+	TokenExpired     error  = errors.New("Token is expired")
+	TokenNotValidYet error  = errors.New("Token not active yet")
+	TokenMalformed   error  = errors.New("That's not even a token")
+	TokenInvalid     error  = errors.New("Couldn't handle this token:")
+	SignKey          string = "newtrekWang"
+)
+
 // JWTAuth 中间件，检查token
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -53,20 +67,6 @@ func JWTAuth() gin.HandlerFunc {
 		c.Set("userID", claims.ID)
 	}
 }
-
-// JWT 签名结构
-type JWT struct {
-	SigningKey []byte
-}
-
-// TokenExpired 一些常量
-var (
-	TokenExpired     error  = errors.New("Token is expired")
-	TokenNotValidYet error  = errors.New("Token not active yet")
-	TokenMalformed   error  = errors.New("That's not even a token")
-	TokenInvalid     error  = errors.New("Couldn't handle this token:")
-	SignKey          string = "newtrekWang"
-)
 
 // CustomClaims 载荷，可以加一些自己需要的信息
 type CustomClaims struct {
