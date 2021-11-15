@@ -29,7 +29,7 @@ func init() {
 // Sett 总配置:显示/隐藏
 type Sett struct {
 	gorm.Model
-	ConBannr      int    `gorm:"default:1" json:"con_banner"` // 1 默认显示  2 不显示  联系人banner
+	ConBannr      int    `gorm:"default:1" json:"con_banner" comment:"1 默认显示  2 不显示  联系人banner"`
 	ConTag        int    `gorm:"default:1" json:"con_tag"`    // 1 默认显示  2 不显示  联系人标签
 	Wild          int    `gorm:"default:1" json:"wild"`       // 1 默认显示  2 不显示  心情广场
 	WildBanner    string `json:"wild_banner"`                 // 心情广场banner
